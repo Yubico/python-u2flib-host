@@ -1,0 +1,107 @@
+#!/usr/bin/python
+#    Copyright (C) 2014  Yubico AB
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from u2flib_host import u2f, exc
+from u2flib_host.constants import APDU_USE_NOT_SATISFIED
+from u2flib_host.utils import u2str
+import time
+import json
+import argparse
+import sys
+
+
+def sign(devices, params, facet, rup):
+    """
+    Signs a U2F challenge with the required U2F device. If user presence is
+    required, wait until the user presses the button.
+    """
+    for device in devices:
+        device.open()
+
+    try:
+        prompted = False
+        while devices:
+            removed = []
+            for device in devices:
+                try:
+                    return u2f.sign(device, params, facet, rup)
+                except exc.APDUError as e:
+                    if e.code == APDU_USE_NOT_SATISFIED:
+                        if not prompted:
+                            sys.stderr.write(
+                                '\nTouch the flashing U2F device to sign...\n')
+                            prompted = True
+                        device.prompt(1)
+                    else:
+                        removed.append(device)
+                except exc.DeviceError:
+                    removed.append(device)
+            devices = [d for d in devices if d not in removed]
+            for d in removed:
+                d.close()
+            time.sleep(0.25)
+    finally:
+        for device in devices:
+            device.close()
+    sys.stderr.write('\nThe required U2F device is not present!\n')
+    return None
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Signs a U2F challenge.\n"
+        "Takes a JSON formatted challenge object on stdin, and returns the "
+        "signature result on stdout.",
+        add_help=True
+    )
+    parser.add_argument('facet', help='the facet for the challenge')
+    parser.add_argument('-r', '--rup', action="store_true", help='require '
+                        'user presence in signature')
+    parser.add_argument('-i', '--infile', help='specify a file to read '
+                        'challenge data from, instead of stdin')
+    parser.add_argument('-o', '--outfile', help='specify a file to write '
+                        'output to, instead of stdout')
+    parser.add_argument('-s', '--soft', help='Specify a soft U2F token file to use')
+    return parser.parse_args()
+
+
+if __name__ == '__main__':
+    args = parse_args()
+
+    facet = unicode(args.facet, sys.stdin.encoding)
+    if args.infile:
+        with open(args.infile, 'r') as f:
+            data = f.read()
+    else:
+        if sys.stdin.isatty():
+            sys.stderr.write('Enter challenge JSON data...\n')
+        data = sys.stdin.read()
+
+    params = json.loads(data, object_hook=u2str)
+
+    if args.soft:
+        from u2flib_host.soft import SoftU2FDevice
+        devices = [SoftU2FDevice(args.soft)]
+    else:
+        devices = u2f.list_devices()
+    result = sign(devices, params, facet, args.rup)
+
+    if args.outfile:
+        with open(args.outfile, 'w') as f:
+            json.dump(result, f)
+        sys.stderr.write('Output written to %s\n' % args.outfile)
+    else:
+        print json.dumps(result)

@@ -1,0 +1,7 @@
+Author: Yubico
+Basename: python-u2flib-host
+Homepage: http://opensource.yubico.com/python-u2flib-host/
+License: GPL-3.0+
+Name: Python U2Flib Host
+Project: python-u2flib-host
+Summary: Python based U2F host library

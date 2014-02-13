@@ -1,0 +1,98 @@
+u2flib-host
+=========
+
+Provides library functionality for communicating with a U2F device over USB.
+
+Two executables are provided, u2f-enroll and u2f-sign, which support the enroll
+and sign commands of U2F v0, as well as v2, as defined in the 2014-02-09
+draft specification, from: http://fidoalliance.org/specifications/download
+
+==License==
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+==Installation==
+
+u2flib-host is installable by running the following command:
+
+  $ python setup.py install
+
+Under Linux you will need to add a Udev rule to be able to access the U2F
+device, or run as root. For example, the Udev rule may contain the following:
+
+# For Udev 188 and later
+# /etc/udev/rules.d/70-gnubby.rules
+
+    ACTION!="add|change", GOTO="gnubby_end"
+
+    ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0211", \
+      ENV{ID_SECURITY_TOKEN}="1"
+
+    LABEL="gnubby_end"
+
+
+# For older Udev versions
+# /etc/udev/rules.d/70-gnubby.rules
+
+    ACTION=="add|change", SUBSYSTEM=="usb", \
+      ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0211", \
+      TEST=="/var/run/ConsoleKit/database", \
+      RUN+="udev-acl --action=$env{ACTION} --device=$env{DEVNAME}"
+
+==Dependencies==
+
+u2flib-host requires a PyUSB compatible backend, such as libusb.
+
+The soft U2F device implementation requires M2Crypto.
+
+==Examples==
+
+===Library use===
+
+    from u2flib_host import winusb
+
+    #Enumerate available devices
+    devices = winusb.list_devices()
+
+    for device in devices:
+        #The with block ensures that the device is opened and closed.
+        with device as dev:
+            #Send a command to the device:
+            dev.call(cmd, data)
+
+===Executable use===
+
+The examples below use the soft U2F device to enroll and sign against the
+u2f_server example server from the python-u2flib-server project. See that
+project for more details.
+The enroll step will create a new U2F key pair and store the credential in the
+soft_device.json file. The sign step will use this credential to sign a
+challenge given by the server.
+
+====Enroll====
+Enroll takes a registration request as input, registering the attached device
+and returns the registration response as output.
+
+    $ u2f-enroll -s soft_device.json http://localhost:8081
+    Enter enrollment JSON data...
+    {"sessionId": "", "challenge": "K0aDxsacDNqrzlaGyLZoFYbXvCJcdIhq0SSaMz-lsV4", "version": "U2F_V2", "app_id": "http://localhost:8081/app-identity"}
+
+    Touch the U2F device you wish to enroll...
+    [{"bd": "eyJvcmlnaW4iOiAiaHR0cDovL2xvY2FsaG9zdDo4MDgxIiwgImNoYWxsZW5nZSI6ICJLMGFEeHNhY0ROcXJ6bGFHeUxab0ZZYlh2Q0pjZElocTBTU2FNei1sc1Y0IiwgInR5cCI6ICJuYXZpZ2F0b3IuaWQuZmluaXNoRW5yb2xsbWVudCJ9", "sessionId": "", "registrationData": "BQTGnJVILHhzuTKg2XClCM5TJjF2WeK4fp9i6fj3VywzOk3d-O1sNaapAUPh-1GxoVCMY6s_jimP-nKqnZT-MGOCQIGD9Hs4qBCXMbfOPfzuB5zhFcOD95ddve67HXV8QeyPDKPZS5zDogvWyl8l4Tv2XRWGo4_6cAPPM4dPZcMreagwggGHMIIBLqADAgECAgkAmb7osQyi7BwwCQYHKoZIzj0EATAhMR8wHQYDVQQDDBZZdWJpY28gVTJGIFNvZnQgRGV2aWNlMB4XDTEzMDcxNzE0MjEwM1oXDTE2MDcxNjE0MjEwM1owITEfMB0GA1UEAwwWWXViaWNvIFUyRiBTb2Z0IERldmljZTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABDvhl91zfpg9n7DeCedcQ8gGXUnemiXoi-JEAxz-EIhkVsMPAyzhtJZ4V3CqMZ-MOUgICt2aMxacMX9cIa8dgS2jUDBOMB0GA1UdDgQWBBQNqL-TV04iaO6mS5tjGE6ShfexnjAfBgNVHSMEGDAWgBQNqL-TV04iaO6mS5tjGE6ShfexnjAMBgNVHRMEBTADAQH_MAkGByqGSM49BAEDSAAwRQIgXJWZdbvOWdhVaG7IJtn44o21Kmi8EHsDk4cAfnZ0r38CIQD6ZPi3Pl4lXxbY7BXFyrpkiOvCpdyNdLLYbSTbvIBQOTBEAiBk3N3-gH2WPhR7EOq2-vEqrC1EZXgYs7fofhYTNk9jqwIgcAVRCeXfCLfLO7X71vKVeXaRQKCJgvmRZdB8PoPVdjw"}]
+
+====Sign====
+Sign takes an authentication request as input, and returns the
+authentication response as output.
+
+    $ u2f-sign -s soft_device.json http://localhost:8081
+    Enter challenge JSON data...
+    {"key_handle": "gYP0ezioEJcxt849_O4HnOEVw4P3l1297rsddXxB7I8Mo9lLnMOiC9bKXyXhO_ZdFYajj_pwA88zh09lwyt5qA", "sessionId": "", "challenge": "zCfLJtWyaCk86Awi5VFtT7hhLk5yncYppYC0z2Q5xxo", "version": "U2F_V2", "app_id": "http://localhost:8081/app-identity"}
+
+    {"bd": "eyJvcmlnaW4iOiAiaHR0cDovL2xvY2FsaG9zdDo4MDgxIiwgImNoYWxsZW5nZSI6ICJ6Q2ZMSnRXeWFDazg2QXdpNVZGdFQ3aGhMazV5bmNZcHBZQzB6MlE1eHhvIiwgInR5cCI6ICJuYXZpZ2F0b3IuaWQuZ2V0QXNzZXJ0aW9uIn0", "challenge": "zCfLJtWyaCk86Awi5VFtT7hhLk5yncYppYC0z2Q5xxo", "app_id": "http://localhost:8081/app-identity", "sessionId": "", "sign": "AQAAAAEwRAIgK8HLGu8SQNPC3hI1700RsTtyXLlsn9_1sEcIcobhDi0CIFzduJ5IdGus-I-ieHTX1R-1xRCA0e29I9kChKbkkIzF"}

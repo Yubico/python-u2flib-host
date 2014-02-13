@@ -1,0 +1,15 @@
+* Version 0.0.3 (unreleased)
+
+  * Added support for U2F_V2.
+
+  * Added soft U2F device for testing purposes.
+
+* Version 0.0.2 (released 2013-10-07)
+
+  * Better instructions in README
+
+  * Includes executables missing from 0.0.1
+
+* Version 0.0.1 (released 2013-08-22)
+
+  * Initial release!
