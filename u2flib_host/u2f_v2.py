@@ -15,13 +15,17 @@
 
 from u2flib_host.constants import INS_ENROLL, INS_SIGN
 from u2flib_host.utils import websafe_decode, websafe_encode, H
+from urllib2 import urlopen
 import json
 
 VERSION = 'U2F_V2'
 
 
 def verify_facet(app_id, facet):
-    pass  # TODO: Verify facet.
+    facets = json.load(urlopen(app_id))
+    if facet not in facets:
+        raise ValueError('Invalid facet: "%s", expecting one of %r' %
+                         (facet, facets))
 
 
 def enroll(device, data, facet, rup=True):
@@ -103,7 +107,8 @@ def sign(device, data, facet, rup=False):
     client_data = json.dumps(client_data)
     client_param = H(client_data)
 
-    request = chr(0x03) + client_param + app_param + chr(len(key_handle)) + key_handle
+    request = chr(0x03) + client_param + app_param + chr(
+        len(key_handle)) + key_handle
 
     p1 = 3 if rup else 0
     p2 = 0
