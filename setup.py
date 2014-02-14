@@ -40,7 +40,7 @@ setup(
     packages=['u2flib_host'],
     scripts=['scripts/u2f-enroll', 'scripts/u2f-sign'],
     setup_requires=['nose>=1.0'],
-    install_requires=['pyusb'],
+    install_requires=['pyusb, requests'],
     test_suite='nose.collector',
     tests_require=['M2Crypto'],
     cmdclass={'release': release},

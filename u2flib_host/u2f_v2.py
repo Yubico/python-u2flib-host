@@ -15,14 +15,14 @@
 
 from u2flib_host.constants import INS_ENROLL, INS_SIGN
 from u2flib_host.utils import websafe_decode, websafe_encode, H
-from urllib2 import urlopen
+import requests
 import json
 
 VERSION = 'U2F_V2'
 
 
 def verify_facet(app_id, facet):
-    facets = json.load(urlopen(app_id))
+    facets = requests.get(app_id).json()
     if facet not in facets:
         raise ValueError('Invalid facet: "%s", expecting one of %r' %
                          (facet, facets))
