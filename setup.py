@@ -21,9 +21,9 @@ VERSION_PATTERN = re.compile(r"(?m)^__version__\s*=\s*['\"](.+)['\"]$")
 
 
 def get_version():
-    """Return the current version as defined by u2flib_server/__init__.py."""
+    """Return the current version as defined by u2flib_host/__init__.py."""
 
-    with open('u2flib_server/__init__.py', 'r') as f:
+    with open('u2flib_host/__init__.py', 'r') as f:
         match = VERSION_PATTERN.search(f.read())
         return match.group(1)
 
@@ -40,7 +40,7 @@ setup(
     packages=['u2flib_host'],
     scripts=['scripts/u2f-enroll', 'scripts/u2f-sign'],
     setup_requires=['nose>=1.0'],
-    install_requires=['pyusb, requests'],
+    install_requires=['pyusb', 'requests'],
     test_suite='nose.collector',
     tests_require=['M2Crypto'],
     cmdclass={'release': release},
