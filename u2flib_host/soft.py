@@ -19,7 +19,7 @@ except ImportError as e:
     print "The soft U2F token requires M2Crypto."
     raise e
 
-from u2flib_host.utils import websafe_encode, websafe_decode, H
+from u2flib_host.utils import H
 from u2flib_host.device import U2FDevice
 from u2flib_host.constants import INS_ENROLL, INS_SIGN
 from u2flib_host import exc
@@ -53,8 +53,11 @@ class SoftU2FDevice(U2FDevice):
 
     """
     This simulates the U2F browser API with a soft U2F device connected.
+
     It can be used for testing.
+
     """
+
     def __init__(self, filename):
         super(SoftU2FDevice, self).__init__()
         self.filename = filename
@@ -109,10 +112,10 @@ class SoftU2FDevice(U2FDevice):
         return raw_response
 
     def _sign(self, data):
-        client_param = data[1:33]
-        app_param = data[33:65]
-        kh_len = ord(data[65])
-        key_handle = data[66:66 + kh_len].encode('hex')
+        client_param = data[:32]
+        app_param = data[32:64]
+        kh_len = ord(data[64])
+        key_handle = data[65:65 + kh_len].encode('hex')
         if not key_handle in self.data['keys']:
             raise ValueError("Unknown key handle!")
 

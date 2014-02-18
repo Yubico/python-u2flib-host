@@ -107,7 +107,7 @@ def sign(device, data, facet, rup=False):
     client_data = json.dumps(client_data)
     client_param = H(client_data)
 
-    request = chr(0x03) + client_param + app_param + chr(
+    request = client_param + app_param + chr(
         len(key_handle)) + key_handle
 
     p1 = 3 if rup else 0
