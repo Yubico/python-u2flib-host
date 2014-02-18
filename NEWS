@@ -1,4 +1,6 @@
-* Version 0.0.3 (unreleased)
+* Version 1.0.0 (released 2014-02-18)
+
+  * First public release.
 
   * Added support for U2F_V2.
 
@@ -12,4 +14,4 @@
 
 * Version 0.0.1 (released 2013-08-22)
 
-  * Initial release!
+  * Initial internal release!
