@@ -23,21 +23,20 @@ import argparse
 import sys
 
 
-def enroll(devices, params, facet, rup):
+def enroll(devices, params, facet):
     """
     Interactively enrolls a single U2F device, given the enrollment data.
     """
     for device in devices:
         device.open()
 
-    if rup:
-        sys.stderr.write('\nTouch the U2F device you wish to enroll...\n')
+    sys.stderr.write('\nTouch the U2F device you wish to enroll...\n')
     try:
         while devices:
             removed = []
             for device in devices:
                 try:
-                    return [u2f.enroll(device, params, facet, rup)]
+                    return [u2f.enroll(device, params, facet, True)]
                 except exc.APDUError as e:
                     if e.code == APDU_USE_NOT_SATISFIED:
                         device.prompt(1)
@@ -53,7 +52,8 @@ def enroll(devices, params, facet, rup):
         for device in devices:
             device.prompt(0)
             device.close()
-    return []
+    sys.stderr.write('\nUnable to enroll with any U2F device.\n')
+    sys.exit(1)
 
 
 def parse_args():
@@ -90,7 +90,7 @@ if __name__ == '__main__':
         devices = [SoftU2FDevice(args.soft)]
     else:
         devices = u2f.list_devices()
-    result = enroll(devices, params, facet, True)
+    result = enroll(devices, params, facet)
 
     if args.outfile:
         with open(args.outfile, 'w') as f:

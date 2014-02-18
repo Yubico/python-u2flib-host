@@ -28,7 +28,7 @@ def verify_facet(app_id, facet):
                          (facet, facets))
 
 
-def enroll(device, data, facet, rup=True):
+def enroll(device, data, facet, rup=True):  # rup is only here for compatibility with v0.
     """
     Enroll a U2F device
 
@@ -61,7 +61,7 @@ def enroll(device, data, facet, rup=True):
 
     request = client_param + app_param
 
-    p1 = 3 if rup else 0
+    p1 = 0x03
     p2 = 0
     response = device.send_apdu(INS_ENROLL, p1, p2, request)
 
@@ -72,7 +72,7 @@ def enroll(device, data, facet, rup=True):
     }
 
 
-def sign(device, data, facet, rup=False):
+def sign(device, data, facet, check_only=False):
     """
     Signs an assertion challenge
 
@@ -110,7 +110,7 @@ def sign(device, data, facet, rup=False):
     request = client_param + app_param + chr(
         len(key_handle)) + key_handle
 
-    p1 = 3 if rup else 0
+    p1 = 0x07 if check_only else 0x03
     p2 = 0
     response = device.send_apdu(INS_SIGN, p1, p2, request)
 

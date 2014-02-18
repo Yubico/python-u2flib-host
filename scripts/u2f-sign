@@ -23,7 +23,7 @@ import argparse
 import sys
 
 
-def sign(devices, params, facet, rup):
+def sign(devices, params, facet, check_only):
     """
     Signs a U2F challenge with the required U2F device. If user presence is
     required, wait until the user presses the button.
@@ -37,9 +37,12 @@ def sign(devices, params, facet, rup):
             removed = []
             for device in devices:
                 try:
-                    return u2f.sign(device, params, facet, rup)
+                    return u2f.sign(device, params, facet, check_only)
                 except exc.APDUError as e:
                     if e.code == APDU_USE_NOT_SATISFIED:
+                        if check_only:
+                            sys.stderr.write('\nCorrect U2F device present!\n')
+                            sys.exit(0)
                         if not prompted:
                             sys.stderr.write(
                                 '\nTouch the flashing U2F device to sign...\n')
@@ -57,7 +60,7 @@ def sign(devices, params, facet, rup):
         for device in devices:
             device.close()
     sys.stderr.write('\nThe required U2F device is not present!\n')
-    return None
+    sys.exit(1)
 
 
 def parse_args():
@@ -68,8 +71,8 @@ def parse_args():
         add_help=True
     )
     parser.add_argument('facet', help='the facet for the challenge')
-    parser.add_argument('-r', '--rup', action="store_true", help='require '
-                        'user presence in signature')
+    parser.add_argument('-c', '--check-only', action="store_true", help='Check if '
+                        'the key handle is correct only, don\'t sign.')
     parser.add_argument('-i', '--infile', help='specify a file to read '
                         'challenge data from, instead of stdin')
     parser.add_argument('-o', '--outfile', help='specify a file to write '
@@ -97,7 +100,7 @@ if __name__ == '__main__':
         devices = [SoftU2FDevice(args.soft)]
     else:
         devices = u2f.list_devices()
-    result = sign(devices, params, facet, args.rup)
+    result = sign(devices, params, facet, args.check_only)
 
     if args.outfile:
         with open(args.outfile, 'w') as f:
