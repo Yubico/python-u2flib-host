@@ -97,4 +97,5 @@ if __name__ == '__main__':
             json.dump(result, f)
         sys.stderr.write('Output written to %s\n' % args.outfile)
     else:
+        sys.stderr.write('\n---Result---\n')
         print json.dumps(result)

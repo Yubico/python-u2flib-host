@@ -39,6 +39,7 @@ def sign(devices, params, facet, check_only):
                 try:
                     return u2f.sign(device, params, facet, check_only)
                 except exc.APDUError as e:
+                    print "APDU error: %04x" % e.code
                     if e.code == APDU_USE_NOT_SATISFIED:
                         if check_only:
                             sys.stderr.write('\nCorrect U2F device present!\n')
@@ -107,4 +108,5 @@ if __name__ == '__main__':
             json.dump(result, f)
         sys.stderr.write('Output written to %s\n' % args.outfile)
     else:
+        sys.stderr.write('\n---Result---\n')
         print json.dumps(result)
