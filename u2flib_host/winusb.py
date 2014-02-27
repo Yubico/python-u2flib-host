@@ -66,9 +66,6 @@ class WinUSBDevice(U2FDevice):
             self.handle.releaseInterface()
             del self.handle
 
-    def get_supported_versions(self):
-        return ['v0', 'U2F_V2']  # TODO: Query the device to check.
-
     def _do_send_apdu(self, apdu_data):
         return self.call(CMD_APDU, apdu_data)
 

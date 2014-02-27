@@ -17,6 +17,8 @@ from u2flib_host.constants import APDU_OK
 from u2flib_host import exc
 import sys
 
+INS_GET_VERSION = 0x03
+
 
 class U2FDevice(object):
 
@@ -57,8 +59,11 @@ class U2FDevice(object):
         """
         Gets a list of supported U2F versions from the device.
         """
-        # Subclasses should implement this.
-        return []
+        try:
+            return [self.send_apdu(INS_GET_VERSION)]
+        except exc.APDUError as e:
+            # v0 didn't support the instruction.
+            return ['v0'] if e.code == 0x6d00 else []
 
     def _do_send_apdu(self, apdu_data):
         """

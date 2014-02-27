@@ -42,9 +42,6 @@ class CCIDDevice(U2FDevice):
     def __init__(self, conn):
         self.conn = conn
 
-    def get_supported_versions(self):
-        return ['U2F_V2']  # TODO: Query the device to check.
-
     def _do_send_apdu(self, apdu_data):
         data, sw1, sw2 = self.conn.transmit(map(ord, apdu_data))
         return ''.join(map(chr, data)) + chr(sw1) + chr(sw2)
