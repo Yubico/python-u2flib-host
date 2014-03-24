@@ -27,6 +27,7 @@ ENDPOINT_IN = 0x81
 CMD_WINK = 0x88
 CMD_PROMPT = 0x87
 CMD_APDU = 0x83
+CMD_SYNC = 0xbc
 
 TIMEOUT = 1000
 BUF_SIZE = 2048
@@ -82,7 +83,7 @@ class WinUSBDevice(U2FDevice):
         self.handle.bulkWrite(ENDPOINT_OUT, payload, TIMEOUT)
         resp = bytearray(self.handle.bulkRead(ENDPOINT_IN, BUF_SIZE, TIMEOUT))
         header = str(resp[:5])
-        if header[:5] != payload[:5]:
+        if header != payload[:5]:
             raise exc.DeviceError("Invalid response from device!")
         data = str(resp[7:])
         data_len = (resp[5] << 8) + resp[6]

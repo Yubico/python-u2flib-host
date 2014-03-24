@@ -18,7 +18,7 @@ from smartcard.System import readers
 from u2flib_host.device import U2FDevice
 from u2flib_host import exc
 
-AID = 'a0000005272201'
+AID = 'a0000005271002'
 CARD_PATTERN = re.compile(".*Yubikey NEO.*")
 
 
