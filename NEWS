@@ -1,3 +1,7 @@
+* Version 1.1.0 (unreleased)
+
+  * Added support for the HID transport.
+
 * Version 1.0.0 (released 2014-02-18)
 
   * First public release.

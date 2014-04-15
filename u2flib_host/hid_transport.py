@@ -21,9 +21,6 @@ from u2flib_host import exc
 
 VENDOR_ID = 0x1050
 PRODUCT_ID = 0x0200
-INTERFACE = 0
-ENDPOINT_OUT = 0x1
-ENDPOINT_IN = 0x81
 HID_RPT_SIZE = 64
 
 TYPE_INIT = 0x80
@@ -37,7 +34,6 @@ CMD_SYNC = 0xbc
 STAT_ERR = 0xbf
 
 TIMEOUT = 1000
-BUF_SIZE = 2048
 
 
 def list_devices():
