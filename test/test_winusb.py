@@ -14,12 +14,13 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from u2flib_host import winusb
+from nose import SkipTest
 
 
 def get_device():
     devs = winusb.list_devices()
-    assert len(devs) == 1, "Tests require a single WinUSB U2F device " \
-        "connected, got %d" % len(devs)
+    if len(devs) != 1:
+        raise SkipTest("Tests require a single WinUSB U2F device")
     return devs[0]
 
 
