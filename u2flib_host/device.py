@@ -59,11 +59,14 @@ class U2FDevice(object):
         """
         Gets a list of supported U2F versions from the device.
         """
-        try:
-            return [self.send_apdu(INS_GET_VERSION)]
-        except exc.APDUError as e:
-            # v0 didn't support the instruction.
-            return ['v0'] if e.code == 0x6d00 else []
+        if not hasattr(self, '_versions'):
+            try:
+                self._versions = [self.send_apdu(INS_GET_VERSION)]
+            except exc.APDUError as e:
+                # v0 didn't support the instruction.
+                self._versions = ['v0'] if e.code == 0x6d00 else []
+
+        return self._versions
 
     def _do_send_apdu(self, apdu_data):
         """

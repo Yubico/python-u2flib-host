@@ -18,7 +18,7 @@ from u2flib_host.device import U2FDevice
 from u2flib_host import exc
 
 VENDOR_ID = 0x1050
-PRODUCT_ID = 0X0211
+PRODUCT_ID = 0x0211
 INTERFACE = 0
 ENDPOINT_OUT = 0x1
 ENDPOINT_IN = 0x81

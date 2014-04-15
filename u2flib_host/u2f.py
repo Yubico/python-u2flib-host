@@ -14,11 +14,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from u2flib_host import u2f_v0, u2f_v2
-from u2flib_host import winusb, ccid
+from u2flib_host import winusb_transport, ccid_transport, hid_transport
 
 TRANSPORTS = [
-    winusb,
-    ccid
+    winusb_transport,
+    ccid_transport,
+    hid_transport
 ]
 
 LIB_VERSIONS = {
