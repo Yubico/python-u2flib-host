@@ -22,7 +22,7 @@ GNU General Public License for more details.
 
 u2flib-host is installable by running the following command:
 
-  $ python setup.py install
+  # python setup.py install
 
 Under Linux you will need to add a Udev rule to be able to access the U2F
 device, or run as root. For example, the Udev rule may contain the following:
@@ -48,7 +48,17 @@ device, or run as root. For example, the Udev rule may contain the following:
 
 ==Dependencies==
 
-u2flib-host requires a PyUSB compatible backend, such as libusb.
+WinUSB:
+To support WinUSB devices, u2flib-host requires a PyUSB compatible backend,
+such as libusb.
+
+HID:
+To support HID devices, u2flib-host uses hidapi, which has a few dependencies
+for building. On a Debian based system, run the following command before
+installation (python setup.py install):
+
+  # apt-get install build-essential python-dev cython libusb-1.0-0-dev \
+    libudev-dev
 
 The soft U2F device implementation requires M2Crypto.
 
