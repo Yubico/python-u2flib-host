@@ -31,7 +31,6 @@ TYPE_INIT = 0x80
 CMD_INIT = 0x06
 CMD_WINK = 0x08
 CMD_APDU = 0x03
-CMD_SYNC = 0xbc
 
 STAT_ERR = 0xbf
 
@@ -56,8 +55,10 @@ def _read_timeout(dev, size, timeout=1.0):
     return []
 
 
-class SyncError(Exception):
-    pass
+class U2FHIDError(Exception):
+    def __init__(self, code):
+        super(Exception, self).__init__("U2FHIDError: 0x%02x" % code)
+        self.code = code
 
 
 class HIDDevice(U2FDevice):
@@ -92,9 +93,6 @@ class HIDDevice(U2FDevice):
     def _do_send_apdu(self, apdu_data):
         return self.call(CMD_APDU, apdu_data)
 
-    def sync(self):
-        self.call(CMD_SYNC)
-
     def wink(self):
         self.call(CMD_WINK)
 
@@ -121,7 +119,7 @@ class HIDDevice(U2FDevice):
         while resp and resp[:5] != header:
             resp = ''.join(map(chr, _read_timeout(self.handle, HID_RPT_SIZE)))
             if resp[:5] == cid + chr(STAT_ERR):
-                raise SyncError()
+                raise U2FHIDError(resp[6])
 
         if not resp:
             raise exc.DeviceError("Invalid response from device!")
@@ -148,10 +146,4 @@ class HIDDevice(U2FDevice):
             data = chr(data)
 
         self._send_req(self.cid, cmd, data)
-        try:
-            resp = self._read_resp(self.cid, cmd)
-        except SyncError:
-            self.sync()
-            return self.call(cmd, data)
-
-        return resp
+        return self._read_resp(self.cid, cmd)
