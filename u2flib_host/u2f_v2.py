@@ -21,8 +21,13 @@ import json
 VERSION = 'U2F_V2'
 
 
+app_cache = {}
+
+
 def verify_facet(app_id, facet):
-    facets = requests.get(app_id).json()
+    if app_id not in app_cache:
+        app_cache[app_id] = requests.get(app_id).json()
+    facets = app_cache[app_id]
     if facet not in facets:
         raise ValueError('Invalid facet: "%s", expecting one of %r' %
                          (facet, facets))
@@ -35,8 +40,7 @@ def enroll(device, data, facet, rup=True):  # rup is only here for compatibility
     data = {
         "version": "U2F_V2",
         "challenge": string, //b64 encoded challenge
-        "app_id": string, //app_id
-        "sessionId": string //opaque session ID
+        "appId": string, //app_id
     }
 
     """
@@ -47,7 +51,7 @@ def enroll(device, data, facet, rup=True):  # rup is only here for compatibility
     if data['version'] != VERSION:
         raise ValueError("Unsupported U2F version: %s" % data['version'])
 
-    app_id = data['app_id']
+    app_id = data['appId']
     verify_facet(app_id, facet)
     app_param = H(app_id)
 
@@ -67,8 +71,7 @@ def enroll(device, data, facet, rup=True):  # rup is only here for compatibility
 
     return {
         "registrationData": websafe_encode(response),
-        "bd": websafe_encode(client_data),
-        "sessionId": data['sessionId']
+        "clientData": websafe_encode(client_data)
     }
 
 
@@ -79,9 +82,8 @@ def sign(device, data, facet, check_only=False):
     data = {
         'version': "U2F_V2",
         'challenge': websafe_encode(self.challenge),
-        'app_id': self.binding.app_id,
-        'key_handle': websafe_encode(self.binding.key_handle),
-        'sessionId': websafe_encode(self.session_id)
+        'appId': self.binding.app_id,
+        'keyHandle': websafe_encode(self.binding.key_handle)
     }
 
     """
@@ -92,11 +94,11 @@ def sign(device, data, facet, check_only=False):
     if data['version'] != VERSION:
         raise ValueError("Unsupported U2F version: %s" % data['version'])
 
-    app_id = data['app_id']
+    app_id = data['appId']
     verify_facet(app_id, facet)
     app_param = H(app_id)
 
-    key_handle = websafe_decode(data['key_handle'])
+    key_handle = websafe_decode(data['keyHandle'])
 
     # Client data
     client_data = {
@@ -115,9 +117,7 @@ def sign(device, data, facet, check_only=False):
     response = device.send_apdu(INS_SIGN, p1, p2, request)
 
     return {
-        "bd": websafe_encode(client_data),
-        "sign": websafe_encode(response),
-        "challenge": data['challenge'],
-        "sessionId": data['sessionId'],
-        "app_id": data['app_id']
+        "clientData": websafe_encode(client_data),
+        "signatureData": websafe_encode(response),
+        "challenge": data['challenge']
     }

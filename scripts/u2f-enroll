@@ -39,7 +39,7 @@ def enroll(devices, params, facet):
             removed = []
             for device in devices:
                 try:
-                    return [u2f.enroll(device, params, facet, True)]
+                    return u2f.enroll(device, params, facet, True)
                 except exc.APDUError as e:
                     if e.code == APDU_USE_NOT_SATISFIED:
                         pass
