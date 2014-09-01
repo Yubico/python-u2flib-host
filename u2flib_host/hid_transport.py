@@ -21,16 +21,21 @@ from u2flib_host import exc
 
 DEVICES = [
     (0x1050, 0x0200),  # Gnubby
+    (0x1050, 0x0113),  # YubiKey NEO U2F
+    (0x1050, 0x0114),  # YubiKey NEO OTP+U2F
     (0x1050, 0x0115),  # YubiKey NEO U2F+CCID
+    (0x1050, 0x0116),  # YubiKey NEO OTP+U2F+CCID
 ]
 HID_RPT_SIZE = 64
 
 TYPE_INIT = 0x80
+U2F_VENDOR_FIRST = 0x40
 
 # USB Commands
 CMD_INIT = 0x06
 CMD_WINK = 0x08
 CMD_APDU = 0x03
+U2FHID_YUBIKEY_DEVICE_CONFIG = U2F_VENDOR_FIRST
 
 STAT_ERR = 0xbf
 
@@ -90,6 +95,10 @@ class HIDDevice(U2FDevice):
             resp = self._read_resp(self.cid, CMD_INIT)
         self.cid = resp[8:12]
 
+    def set_mode(self, mode):
+        data = ("%02x0f0000" % mode).decode('hex')
+        self.call(U2FHID_YUBIKEY_DEVICE_CONFIG, data)
+
     def _do_send_apdu(self, apdu_data):
         return self.call(CMD_APDU, apdu_data)
 
@@ -119,7 +128,7 @@ class HIDDevice(U2FDevice):
         while resp and resp[:5] != header:
             resp = ''.join(map(chr, _read_timeout(self.handle, HID_RPT_SIZE)))
             if resp[:5] == cid + chr(STAT_ERR):
-                raise U2FHIDError(resp[6])
+                raise U2FHIDError(ord(resp[6]))
 
         if not resp:
             raise exc.DeviceError("Invalid response from device!")

@@ -27,8 +27,11 @@ def enroll(devices, params, facet):
     """
     Interactively enrolls a single U2F device, given the enrollment data.
     """
-    for device in devices:
-        device.open()
+    for device in devices[:]:
+        try:
+            device.open()
+        except:
+            devices.remove(device)
 
     sys.stderr.write('\nTouch the U2F device you wish to enroll...\n')
     try:

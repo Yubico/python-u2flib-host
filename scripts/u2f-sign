@@ -28,8 +28,11 @@ def sign(devices, params, facet, check_only):
     Signs a U2F challenge with the required U2F device. If user presence is
     required, wait until the user presses the button.
     """
-    for device in devices:
-        device.open()
+    for device in devices[:]:
+        try:
+            device.open()
+        except:
+            devices.remove(device)
 
     try:
         prompted = False
