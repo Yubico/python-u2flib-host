@@ -16,7 +16,6 @@
 import re
 from smartcard.System import readers
 from u2flib_host.device import U2FDevice
-from u2flib_host import exc
 
 AID = 'a0000005271002'
 CARD_PATTERN = re.compile(".*Yubikey NEO.*")
@@ -31,10 +30,13 @@ def list_devices():
     for reader in readers():
         if CARD_PATTERN.match(reader.name):
             conn = reader.createConnection()
-            conn.connect()
-            data, sw1, sw2 = conn.transmit(hex2cmd('00a4040007%s' % AID))
-            if (sw1, sw2) == (0x90, 0x00):
-                devices.append(CCIDDevice(conn))
+            try:
+                conn.connect()
+                data, sw1, sw2 = conn.transmit(hex2cmd('00a4040007%s' % AID))
+                if (sw1, sw2) == (0x90, 0x00):
+                    devices.append(CCIDDevice(conn))
+            except:
+                pass
     return devices
 
 
