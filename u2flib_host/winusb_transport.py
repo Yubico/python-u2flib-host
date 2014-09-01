@@ -70,9 +70,6 @@ class WinUSBDevice(U2FDevice):
     def _do_send_apdu(self, apdu_data):
         return self.call(CMD_APDU, apdu_data)
 
-    def prompt(self, seconds):
-        self.call(CMD_PROMPT, seconds)
-
     def call(self, cmd, data=''):
         if isinstance(data, int):
             data = chr(data)

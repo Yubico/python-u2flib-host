@@ -47,7 +47,6 @@ def sign(devices, params, facet, check_only):
                             sys.stderr.write(
                                 '\nTouch the flashing U2F device to sign...\n')
                             prompted = True
-                        device.prompt(1)
                     else:
                         removed.append(device)
                 except exc.DeviceError:

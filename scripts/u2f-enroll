@@ -39,7 +39,7 @@ def enroll(devices, params, facet):
                     return [u2f.enroll(device, params, facet, True)]
                 except exc.APDUError as e:
                     if e.code == APDU_USE_NOT_SATISFIED:
-                        device.prompt(1)
+                        pass
                     else:
                         removed.append(device)
                 except exc.DeviceError:
@@ -50,7 +50,6 @@ def enroll(devices, params, facet):
             time.sleep(0.25)
     finally:
         for device in devices:
-            device.prompt(0)
             device.close()
     sys.stderr.write('\nUnable to enroll with any U2F device.\n')
     sys.exit(1)

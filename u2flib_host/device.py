@@ -75,14 +75,6 @@ class U2FDevice(object):
         # Subclasses should implement this.
         raise NotImplementedError('_do_send_apdu not implemented!')
 
-    def prompt(self, seconds):
-        """
-        Causes the U2F device to prompt the user for user presence, if
-        possible.
-        """
-        # Subclasses should implement this, if possible.
-        pass
-
     def send_apdu(self, ins, p1=0, p2=0, data=''):
         """
         Sends an APDU to the device, and waits for a response.
