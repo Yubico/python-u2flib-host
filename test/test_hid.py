@@ -13,14 +13,14 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from u2flib_host.winusb_transport import list_devices
+from u2flib_host.hid_transport import list_devices
 from nose import SkipTest
 
 
 def get_device():
     devs = list_devices()
     if len(devs) != 1:
-        raise SkipTest("Tests require a single WinUSB U2F device")
+        raise SkipTest("Tests require a single U2FHID device")
     return devs[0]
 
 
@@ -36,9 +36,9 @@ def test_echo():
     msg2 = '            '
     msg3 = ''
     with get_device() as dev:
-        resp1 = dev.send_apdu(0x10, 0, 0, msg1)
-        resp2 = dev.send_apdu(0x10, 0, 0, msg2)
-        resp3 = dev.send_apdu(0x10, 0, 0, msg3)
+        resp1 = dev.send_apdu(0x40, 0, 0, msg1)
+        resp2 = dev.send_apdu(0x40, 0, 0, msg2)
+        resp3 = dev.send_apdu(0x40, 0, 0, msg3)
     assert resp1 == msg1
     assert resp2 == msg2
     assert resp3 == msg3
