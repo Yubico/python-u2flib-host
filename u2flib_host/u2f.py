@@ -13,17 +13,15 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from u2flib_host import u2f_v0, u2f_v2
-from u2flib_host import winusb_transport, ccid_transport, hid_transport
+from u2flib_host import u2f_v2
+from u2flib_host import ccid_transport, hid_transport
 
 TRANSPORTS = [
-    winusb_transport,
     ccid_transport,
     hid_transport
 ]
 
 LIB_VERSIONS = {
-    'v0': u2f_v0,
     'U2F_V2': u2f_v2
 }
 
@@ -34,12 +32,12 @@ def list_devices():
 
 
 def get_lib(data):
-    version = data.get('version', 'v0')
-    return LIB_VERSIONS[data.get('version', 'v0')]
+    version = data.get('version')
+    return LIB_VERSIONS[data.get('version', 'U2F_V2')]
 
 
 def enroll(device, data, facet, rup=True):
-    version = data.get('version', 'v0')
+    version = data.get('version')
     if version not in device.get_supported_versions():
         raise ValueError("Device does not support U2F version: %s" % version)
     if version not in LIB_VERSIONS:

@@ -43,7 +43,7 @@ TIMEOUT = 1000
 
 
 def list_devices():
-    # Once standardized, this should be VID/PID-agnostic
+    # TODO: Check the usage page to determine what is a U2F device
     devices = []
     for d in hid.enumerate(0, 0):
         if (d['vendor_id'], d['product_id']) in DEVICES:
