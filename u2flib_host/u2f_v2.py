@@ -119,5 +119,5 @@ def sign(device, data, facet, check_only=False):
     return {
         "clientData": websafe_encode(client_data),
         "signatureData": websafe_encode(response),
-        "challenge": data['challenge']
+        "keyHandle": data['keyHandle']
     }
