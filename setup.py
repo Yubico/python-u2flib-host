@@ -36,7 +36,6 @@ setup(
     maintainer='Yubico Open Source Maintainers',
     maintainer_email='ossmaint@yubico.com',
     url='https://github.com/Yubico/python-u2flib-host',
-    license='proprietary',
     packages=['u2flib_host'],
     scripts=['scripts/u2f-enroll', 'scripts/u2f-sign'],
     setup_requires=['nose>=1.0'],
@@ -45,7 +44,7 @@ setup(
     tests_require=['M2Crypto'],
     cmdclass={'release': release},
     classifiers=[
-        'License :: Other/Proprietary License',
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Development Status :: 2 - Pre-Alpha',
