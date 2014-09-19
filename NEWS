@@ -1,3 +1,9 @@
+* Version 1.2.0 (unreleased)
+
+  * Updated to U2F_V2 standard.
+
+  * Removed old draft versions.
+
 * Version 1.1.0 (released 2014-04-15)
 
   * Added support for the HID transport.

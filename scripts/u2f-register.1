@@ -18,26 +18,27 @@
 \\$2 \(laURL: \\$1 \(ra\\$3
 ..
 .if \n[.g] .mso www.tmac
-.TH enroll "1" "Aug 2013" "python-u2flib-host"
+.TH u2f-register "1" "Aug 2013" "python-u2flib-host"
 .SH NAME
-enroll - Command-line tool for enrolling a U2F device.
+u2f-register - Command-line tool for registering a U2F device.
 .SH SYNOPSIS
-.B enroll
+.B u2f-register
 [\fI--help\fR] [\fI--infile file\fR] [\fI--outfile file\fR] facet
 
 .SH DESCRIPTION
-Enrolls a U2F device. Takes a JSON formatted enrollment object on stdin, and
-returns the result on stdout.
+Register a U2F device. Takes a JSON formatted RegisterRequest object on stdin,
+and returns the result on stdout.
 .HP
 \fB\-\-help, \-h\fR Usage help.
 .HP
-\fB\-\-infile, \-i\fR A file to read enrollment data from, instead of stdin.
+\fB\-\-infile, \-i\fR A file to read registration data from, instead of stdin.
 .HP
 \fB\-\-outfile, \-o\fR A file to write output to, instead of stdout.
 .HP
-\fB\-\-soft, \-s\fR A file to use as a soft U2F token. It will be created if it does not exist.
+\fB\-\-soft, \-s\fR A file to use as a soft U2F token. It will be created if
+it does not exist.
 .HP
-\fBfacet \fR The facet of the enrollment request.
+\fBfacet \fR The facet of the RegistrationRequest.
 .SH BUGS
-Report enroll bugs in
+Report u2f-register bugs in
 .URL "https://github.com/Yubico/python-u2flib-host/issues" "the issue tracker"

@@ -18,29 +18,30 @@
 \\$2 \(laURL: \\$1 \(ra\\$3
 ..
 .if \n[.g] .mso www.tmac
-.TH sign "1" "Aug 2013" "python-u2flib-host"
+.TH u2f-authenticate "1" "Aug 2013" "python-u2flib-host"
 .SH NAME
-sign - Command-line tool for signing a U2F challenge.
+u2f-authenticate - Command-line tool for authentication using a U2F device.
 .SH SYNOPSIS
-.B sign
+.B u2f-authenticate
 [\fI--help\fR] [\fI--infile file\fR] [\fI--outfile file\fR] [\fI--rup\fR] facet
 
 .SH DESCRIPTION
 Signs a U2F challenge using an attached U2F device.
-Takes a JSON formatted challenge object on stdin, and returns the result on
-stdout.
+Takes a JSON formatted AuthenticationRequest object on stdin, and returns the
+result on stdout.
 .HP
 \fB\-\-help, \-h\fR Usage help.
 .HP
-\fB\-\-infile, \-i\fR A file to read the challenge data from, instead of stdin.
+\fB\-\-infile, \-i\fR A file to read the autentication data from, instead of
+stdin.
 .HP
 \fB\-\-outfile, \-o\fR A file to write output to, instead of stdout.
 .HP
-\fB\-\-rup, \-r\fR Require user presence in the signature.
+\fB\-\-check, \-r\fR Perform the request as a check-only.
 .HP
 \fB\-\-soft, \-s\fR A file to use as a soft U2F token.
 .HP
 \fBfacet \fR The facet of the U2F challenge.
 .SH BUGS
-Report sign bugs in
+Report u2f-authenticate bugs in
 .URL "https://github.com/Yubico/python-u2flib-host/issues" "the issue tracker"

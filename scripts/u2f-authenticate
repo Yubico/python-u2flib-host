@@ -23,9 +23,10 @@ import argparse
 import sys
 
 
-def enroll(devices, params, facet):
+def authenticate(devices, params, facet, check_only):
     """
-    Interactively enrolls a single U2F device, given the enrollment data.
+    Interactively authenticates a AuthenticateRequest using an attached U2F
+    device.
     """
     for device in devices[:]:
         try:
@@ -33,16 +34,22 @@ def enroll(devices, params, facet):
         except:
             devices.remove(device)
 
-    sys.stderr.write('\nTouch the U2F device you wish to enroll...\n')
     try:
+        prompted = False
         while devices:
             removed = []
             for device in devices:
                 try:
-                    return u2f.enroll(device, params, facet, True)
+                    return u2f.authenticate(device, params, facet, check_only)
                 except exc.APDUError as e:
                     if e.code == APDU_USE_NOT_SATISFIED:
-                        pass
+                        if check_only:
+                            sys.stderr.write('\nCorrect U2F device present!\n')
+                            sys.exit(0)
+                        if not prompted:
+                            sys.stderr.write('\nTouch the flashing U2F device '
+                                             'to authenticate...\n')
+                            prompted = True
                     else:
                         removed.append(device)
                 except exc.DeviceError:
@@ -54,22 +61,24 @@ def enroll(devices, params, facet):
     finally:
         for device in devices:
             device.close()
-    sys.stderr.write('\nUnable to enroll with any U2F device.\n')
+    sys.stderr.write('\nThe required U2F device is not present!\n')
     sys.exit(1)
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Enrolls a U2F device.\n"
-        "Takes a JSON formatted enrollment object on stdin, and returns the "
-        "result on stdout.",
+        description="Authenticaties an AuthenticateRequest.\n"
+        "Takes a JSON formatted AuthenticateRequest object on stdin, and "
+        "returns the resulting AuthenticateResponse on stdout.",
         add_help=True
     )
-    parser.add_argument('facet', help='the facet for enrollment')
+    parser.add_argument('facet', help='the facet for the challenge')
+    parser.add_argument('-c', '--check-only', action="store_true", help='Check if '
+                        'the key handle is correct only, don\'t sign.')
     parser.add_argument('-i', '--infile', help='specify a file to read '
-                        'enrollment data from, instead of stdin')
+                        'AuthenticateRequest from, instead of stdin')
     parser.add_argument('-o', '--outfile', help='specify a file to write '
-                        'output to, instead of stdout')
+                        'the AuthenticateResponse to, instead of stdout')
     parser.add_argument('-s', '--soft', help='Specify a soft U2F token file to use')
     return parser.parse_args()
 
@@ -83,8 +92,9 @@ if __name__ == '__main__':
             data = f.read()
     else:
         if sys.stdin.isatty():
-            sys.stderr.write('Enter enrollment JSON data...\n')
+            sys.stderr.write('Enter AuthenticateRequest JSON data...\n')
         data = sys.stdin.read()
+
     params = json.loads(data, object_hook=u2str)
 
     if args.soft:
@@ -92,7 +102,7 @@ if __name__ == '__main__':
         devices = [SoftU2FDevice(args.soft)]
     else:
         devices = u2f.list_devices()
-    result = enroll(devices, params, facet)
+    result = authenticate(devices, params, facet, args.check_only)
 
     if args.outfile:
         with open(args.outfile, 'w') as f:

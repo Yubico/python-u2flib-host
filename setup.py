@@ -37,7 +37,7 @@ setup(
     maintainer_email='ossmaint@yubico.com',
     url='https://github.com/Yubico/python-u2flib-host',
     packages=['u2flib_host'],
-    scripts=['scripts/u2f-enroll', 'scripts/u2f-sign'],
+    scripts=['scripts/u2f-register', 'scripts/u2f-authenticate'],
     setup_requires=['nose>=1.0'],
     install_requires=['pyscard', 'requests', 'hidapi>=0.7.99'],
     test_suite='nose.collector',

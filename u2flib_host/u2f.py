@@ -32,11 +32,10 @@ def list_devices():
 
 
 def get_lib(data):
-    version = data.get('version')
     return LIB_VERSIONS[data.get('version', 'U2F_V2')]
 
 
-def enroll(device, data, facet, rup=True):
+def register(device, data, facet):
     version = data.get('version')
     if version not in device.get_supported_versions():
         raise ValueError("Device does not support U2F version: %s" % version)
@@ -44,10 +43,10 @@ def enroll(device, data, facet, rup=True):
         raise ValueError("Library does not support U2F version: %s" % version)
 
     lib = LIB_VERSIONS[version]
-    return lib.enroll(device, data, facet, rup)
+    return lib.register(device, data, facet)
 
 
-def sign(device, data, facet, rup=False):
+def authenticate(device, data, facet, check_only=False):
     version = data['version']
     if version not in device.get_supported_versions():
         raise ValueError("Device does not support U2F version: %s" % version)
@@ -55,4 +54,4 @@ def sign(device, data, facet, rup=False):
         raise ValueError("Library does not support U2F version: %s" % version)
 
     lib = LIB_VERSIONS[version]
-    return lib.sign(device, data, facet, rup)
+    return lib.authenticate(device, data, facet, check_only)

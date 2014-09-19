@@ -15,27 +15,15 @@
 
 from u2flib_host.constants import INS_ENROLL, INS_SIGN
 from u2flib_host.utils import websafe_decode, websafe_encode, H
-import requests
+from u2flib_host.appid import verify_facet
 import json
 
 VERSION = 'U2F_V2'
 
 
-app_cache = {}
-
-
-def verify_facet(app_id, facet):
-    if app_id not in app_cache:
-        app_cache[app_id] = requests.get(app_id).json()
-    facets = app_cache[app_id]
-    if facet not in facets:
-        raise ValueError('Invalid facet: "%s", expecting one of %r' %
-                         (facet, facets))
-
-
-def enroll(device, data, facet, rup=True):  # rup is only here for compatibility with v0.
+def register(device, data, facet):
     """
-    Enroll a U2F device
+    Register a U2F device
 
     data = {
         "version": "U2F_V2",
@@ -49,14 +37,14 @@ def enroll(device, data, facet, rup=True):  # rup is only here for compatibility
         data = json.loads(data)
 
     if data['version'] != VERSION:
-        raise ValueError("Unsupported U2F version: %s" % data['version'])
+        raise ValueError('Unsupported U2F version: %s' % data['version'])
 
-    app_id = data['appId']
+    app_id = data.get('appId', facet)
     verify_facet(app_id, facet)
     app_param = H(app_id)
 
     client_data = {
-        'typ': "navigator.id.finishEnrollment",
+        'typ': 'navigator.id.finishEnrollment',
         'challenge': data['challenge'],
         'origin': facet
     }
@@ -70,14 +58,14 @@ def enroll(device, data, facet, rup=True):  # rup is only here for compatibility
     response = device.send_apdu(INS_ENROLL, p1, p2, request)
 
     return {
-        "registrationData": websafe_encode(response),
-        "clientData": websafe_encode(client_data)
+        'registrationData': websafe_encode(response),
+        'clientData': websafe_encode(client_data)
     }
 
 
-def sign(device, data, facet, check_only=False):
+def authenticate(device, data, facet, check_only=False):
     """
-    Signs an assertion challenge
+    Signs an authentication challenge
 
     data = {
         'version': "U2F_V2",
@@ -92,9 +80,9 @@ def sign(device, data, facet, check_only=False):
         data = json.loads(data)
 
     if data['version'] != VERSION:
-        raise ValueError("Unsupported U2F version: %s" % data['version'])
+        raise ValueError('Unsupported U2F version: %s' % data['version'])
 
-    app_id = data['appId']
+    app_id = data.get('appId', facet)
     verify_facet(app_id, facet)
     app_param = H(app_id)
 
@@ -102,7 +90,7 @@ def sign(device, data, facet, check_only=False):
 
     # Client data
     client_data = {
-        'typ': "navigator.id.getAssertion",
+        'typ': 'navigator.id.getAssertion',
         'challenge': data['challenge'],
         'origin': facet
     }
@@ -117,7 +105,7 @@ def sign(device, data, facet, check_only=False):
     response = device.send_apdu(INS_SIGN, p1, p2, request)
 
     return {
-        "clientData": websafe_encode(client_data),
-        "signatureData": websafe_encode(response),
-        "keyHandle": data['keyHandle']
+        'clientData': websafe_encode(client_data),
+        'signatureData': websafe_encode(response),
+        'keyHandle': data['keyHandle']
     }

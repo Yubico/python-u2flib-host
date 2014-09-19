@@ -15,9 +15,9 @@
 
 try:
     from M2Crypto import EC, BIO
-except ImportError as e:
+except ImportError:
     print "The soft U2F token requires M2Crypto."
-    raise e
+    raise
 
 from u2flib_host.utils import H
 from u2flib_host.device import U2FDevice
@@ -72,16 +72,16 @@ class SoftU2FDevice(U2FDevice):
             json.dump(self.data, fp)
 
     def get_supported_versions(self):
-        return ['U2F_V2']  # TODO: Add support for v0.
+        return ['U2F_V2']
 
     def send_apdu(self, ins, p1=0, p2=0, data=''):
         if ins == INS_ENROLL:
-            return self._enroll(data)
+            return self._register(data)
         elif ins == INS_SIGN:
-            return self._sign(data)
+            return self._authenticate(data)
         raise exc.APDUError(0x6d00)  # INS not supported.
 
-    def _enroll(self, data):
+    def _register(self, data):
         client_param = data[:32]
         app_param = data[32:]
 
@@ -111,12 +111,12 @@ class SoftU2FDevice(U2FDevice):
 
         return raw_response
 
-    def _sign(self, data):
+    def _authenticate(self, data):
         client_param = data[:32]
         app_param = data[32:64]
         kh_len = ord(data[64])
         key_handle = data[65:65 + kh_len].encode('hex')
-        if not key_handle in self.data['keys']:
+        if key_handle not in self.data['keys']:
             raise ValueError("Unknown key handle!")
 
         # Unwrap:
