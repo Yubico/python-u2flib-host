@@ -25,6 +25,7 @@ DEVICES = [
     (0x1050, 0x0114),  # YubiKey NEO OTP+U2F
     (0x1050, 0x0115),  # YubiKey NEO U2F+CCID
     (0x1050, 0x0116),  # YubiKey NEO OTP+U2F+CCID
+    (0x1050, 0x0120),  # Security Key by Yubico
 ]
 HID_RPT_SIZE = 64
 
