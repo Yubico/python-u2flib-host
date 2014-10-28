@@ -1,5 +1,7 @@
 * Version 2.0.1 (unreleased)
 
+  * Ignore failures while listing devices, as other transport might be working.
+
   * Support for Security Key by Yubico
 
 * Version 2.0.0 (released 2014-09-26)

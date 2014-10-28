@@ -27,8 +27,14 @@ LIB_VERSIONS = {
 
 
 def list_devices():
-    # Combine list_devices for all transports.
-    return [dev for trans in TRANSPORTS for dev in trans.list_devices()]
+    # Combine list_devices for all transports, ignoring exceptions.
+    devices = []
+    for transport in TRANSPORTS:
+        try:
+            devices.extend(transport.list_devices())
+        except:
+            pass
+    return devices
 
 
 def get_lib(data):
