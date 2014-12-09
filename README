@@ -2,8 +2,8 @@
 Provides library functionality for communicating with a U2F device over USB.
 
 Two executables are provided, u2f-register and u2f-authenticate, which support
-the register and authenticated commands of U2F as defined in the FIDO
-specifications, available here: http://fidoalliance.org/specifications/download
+the register and authenticated commands of U2F as defined in the
+http://fidoalliance.org/specifications/download[FIDO specifications].
 
 === License ===
 This program is free software: you can redistribute it and/or modify
@@ -24,10 +24,12 @@ u2flib-host is installable by running the following command:
 Under Linux you will need to add a Udev rule to be able to access the U2F
 device, or run as root. For example, the Udev rule may contain the following:
 
+----
 #Udev rule for allowing HID access to Yubico devices for U2F support.
 
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", \
   MODE="0664", GROUP="plugdev", ATTRS{idVendor}=="1050"
+----
 
 === Dependencies ===
 To support HID devices, u2flib-host uses hidapi, which has a few dependencies
@@ -45,6 +47,7 @@ it is easiest installed using:
 === Examples ===
 ==== Library use ====
 
+[source, python]
 ----
 from u2flib_host import u2f, exc
 
@@ -60,8 +63,9 @@ for device in devices:
 
 ==== Executable use ====
 The examples below use the soft U2F device to register and authenticate against
-the u2f_server example server from the python-u2flib-server project. See that
-project for more details.
+the u2f_server example server from the 
+http://developers.yubico.com/python-u2flib-server[python-u2flib-server] project. 
+See that project for more details.
 The register step will create a new U2F key pair and store the credential in
 the soft_device.json file. The authenticate step will use this credential to
 sign a challenge given by the server.
