@@ -1,3 +1,7 @@
+* Version 2.1.1 (unreleased)
+
+  * Check both usage page and usage.
+
 * Version 2.1.0 (released 2015-04-13)
 
   * Use usage page based filtering if possible.
