@@ -108,7 +108,7 @@ class AppIDVerifier(object):
 
         return True
 
-    def verify_facet(self, app_id, facet, version=(2, 0)):
+    def verify_facet(self, app_id, facet, version=(1, 0)):
         url = urlparse(app_id)
 
         # If the AppID is not an HTTPS URL, and matches the FacetID of the
@@ -137,7 +137,7 @@ class AppIDVerifier(object):
         for entry in data['trustedFacets']:
             e_ver = entry['version']
             if (e_ver['major'], e_ver['minor']) == version:
-                trustedFacets = self.valid_facets(entry['ids'])
+                trustedFacets = self.valid_facets(app_id, entry['ids'])
                 break
         else:
             raise ValueError(
