@@ -1,5 +1,7 @@
 * Version 2.1.0 (unreleased)
 
+  * Use usage page based filtering if possible.
+
   * Added support for newer YubiKey devices.
 
   * Fix majorVersion in AppID facet verification.

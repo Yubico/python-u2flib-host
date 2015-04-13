@@ -49,11 +49,20 @@ TIMEOUT = 1000
 
 
 def list_devices():
-    # TODO: Check the usage page to determine what is a U2F device
     devices = []
     for d in hid.enumerate(0, 0):
-        if (d['vendor_id'], d['product_id']) in DEVICES:
-            devices.append(HIDDevice(d['path']))
+        usage_page = d['usage_page']
+        if usage_page == 0xf1d0:
+            devices.append(HIDDevice)
+        # Usage page doesn't work on Linux
+        elif usage_page == 0 and (d['vendor_id'], d['product_id']) in DEVICES:
+            device = HIDDevice(d['path'])
+            try:
+                device.open()
+                device.close()
+                devices.append(HIDDevice(d['path']))
+            except exc.DeviceError:
+                pass
     return devices
 
 
