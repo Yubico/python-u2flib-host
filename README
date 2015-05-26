@@ -42,7 +42,7 @@ installation (python setup.py install):
 The soft U2F device implementation requires M2Crypto. On Debian based systems
 it is easiest installed using:
 
-  # apt-get-install python-m2crypto
+  # apt-get install python-m2crypto
 
 === Examples ===
 ==== Library use ====
