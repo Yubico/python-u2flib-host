@@ -3,5 +3,6 @@
 *.egg-info
 build/
 dist/
+.eggs/
 .ropeproject/
 ChangeLog
