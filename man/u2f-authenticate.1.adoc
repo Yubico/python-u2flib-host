@@ -1,0 +1,42 @@
+u2f\-authenticate(1)
+====================
+:doctype: manpage
+:man source: u2f-authenticate
+:man manual: u2f-authenticate manual
+
+== Name
+u2f-authenticate - Command-line tool for authentication using a U2F device.
+
+== Synopsis
+*u2f-authenticate* [--help] [--infile file] [--outfile file] [--check] [--soft file] facet
+
+== Description
+Signs  a  U2F  challenge using an attached U2F device.  Takes a JSON formatted
+AuthenticationRequest object on stdin, and returns the result on stdout.
+
+== Options
+u2f-authenticate has the following options:
+
+*-h, --help*::
+    Shows a list of available sub commands and arguments.
+
+*-i, --infile FILENAME*::
+    A file to read registration data from, instead of stdin.
+
+*-o, --outfile FILENAME*::
+    A file to write output to, instead of stdout.
+
+*-r, --check*::
+    Perform the request as a check-only.
+
+*-s, --soft FILENAME*::
+    A file to use as a soft U2F token.
+
+*facet*::
+    The facet of the U2F challenge.
+
+== Bugs
+Report bugs in the issue tracker (https://github.com/Yubico/python-u2flib-host/issues)
+
+== See also
+*u2f-register*(1)

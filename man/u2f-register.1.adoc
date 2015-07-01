@@ -1,0 +1,39 @@
+u2f\-register(1)
+===============
+:doctype: manpage
+:man source: u2f-register
+:man manual: u2f-register manual
+
+== Name
+u2f-register - Command-line tool for registering a U2F device.
+
+== Synopsis
+*u2f-register* [--help] [--infile file] [--outfile file] facet
+
+== Description
+Register a U2F device. Takes a JSON formatted RegisterRequest object on stdin,
+and returns the result on stdout.
+
+== Options
+u2f-register has the following options:
+
+*-h, --help*::
+    Shows a list of available sub commands and arguments.
+
+*-i, --infile FILENAME*::
+    A file to read registration data from, instead of stdin.
+
+*-o, --outfile FILENAME*::
+    A file to write output to, instead of stdout.
+
+*-s, --soft FILENAME*::
+    A file to use as a soft U2F token. It will be created if it does not exist.
+
+*facet*::
+    The facet of the RegistrationRequest.
+
+== Bugs
+Report bugs in the issue tracker (https://github.com/Yubico/python-u2flib-host/issues)
+
+== See also
+*u2f-authenticate*(1)
