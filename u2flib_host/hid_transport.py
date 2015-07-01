@@ -26,7 +26,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import hid
+try:
+    import hidraw as hid  # Prefer hidraw
+except ImportError:
+    import hid
 from time import time
 from u2flib_host.device import U2FDevice
 from u2flib_host import exc
