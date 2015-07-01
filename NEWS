@@ -1,4 +1,6 @@
-* Version 2.2.0 (unreleased)
+* Version 2.2.1 (unreleased)
+
+* Version 2.2.0 (released 2015-07-01)
  ** License change: Changed license to BSD 2-clause.
  ** Check both usage page and usage.
  ** Prefer hidraw backend over libusb, if available.
