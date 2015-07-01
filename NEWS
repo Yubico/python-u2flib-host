@@ -1,45 +1,32 @@
-* Version 2.1.1 (unreleased)
-
-  * Check both usage page and usage.
+* Version 2.2.0 (unreleased)
+ ** License change: Changed license to BSD 2-clause.
+ ** Check both usage page and usage.
+ ** Prefer hidraw backend over libusb, if available.
 
 * Version 2.1.0 (released 2015-04-13)
-
-  * Use usage page based filtering if possible.
-
-  * Added support for newer YubiKey devices.
-
-  * Fix majorVersion in AppID facet verification.
+ ** Use usage page based filtering if possible.
+ ** Added support for newer YubiKey devices.
+ ** Fix majorVersion in AppID facet verification.
 
 * Version 2.0.1 (released 2014-10-28)
-
-  * Ignore failures while listing devices, as other transport might be working.
-
-  * Support for Security Key by Yubico
+ ** Ignore failures while listing devices, as other transport might be working.
+ ** Support for Security Key by Yubico
 
 * Version 2.0.0 (released 2014-09-26)
-
-  * Updated to U2F_V2 standard.
-
-  * Removed old draft versions.
+ ** Updated to U2F_V2 standard.
+ ** Removed old draft versions.
 
 * Version 1.1.0 (released 2014-04-15)
-
-  * Added support for the HID transport.
+ ** Added support for the HID transport.
 
 * Version 1.0.0 (released 2014-02-18)
-
-  * First public release.
-
-  * Added support for U2F_V2.
-
-  * Added soft U2F device for testing purposes.
+ ** First public release.
+ ** Added support for U2F_V2.
+ ** Added soft U2F device for testing purposes.
 
 * Version 0.0.2 (released 2013-10-07)
-
-  * Better instructions in README
-
-  * Includes executables missing from 0.0.1
+ ** Better instructions in README
+ ** Includes executables missing from 0.0.1
 
 * Version 0.0.1 (released 2013-08-22)
-
-  * Initial internal release!
+ ** Initial internal release!
