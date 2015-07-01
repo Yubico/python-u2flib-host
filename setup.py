@@ -25,24 +25,11 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from setuptools import setup
-from release import release
-import re
-
-VERSION_PATTERN = re.compile(r"(?m)^__version__\s*=\s*['\"](.+)['\"]$")
-
-
-def get_version():
-    """Return the current version as defined by u2flib_host/__init__.py."""
-
-    with open('u2flib_host/__init__.py', 'r') as f:
-        match = VERSION_PATTERN.search(f.read())
-        return match.group(1)
+from u2flib_host.yubicommon.setup import setup
 
 
 setup(
     name='python-u2flib-host',
-    version=get_version(),
     author='Dain Nilsson',
     author_email='dain@yubico.com',
     description='Python based U2F host library',
@@ -51,13 +38,10 @@ setup(
     url='https://github.com/Yubico/python-u2flib-host',
     packages=['u2flib_host'],
     scripts=['scripts/u2f-register', 'scripts/u2f-authenticate'],
-    setup_requires=['nose>=1.0'],
     install_requires=['requests', 'hidapi>=0.7.99'],
-    test_suite='nose.collector',
-    tests_require=['M2Crypto'],
-    cmdclass={'release': release},
+    test_suite='test',
     classifiers=[
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Development Status :: 2 - Pre-Alpha',
