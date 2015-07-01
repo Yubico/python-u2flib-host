@@ -26,31 +26,30 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from u2flib_host.hid_transport import list_devices
-from nose import SkipTest
+import unittest
 
 
-def get_device():
-    devs = list_devices()
-    if len(devs) != 1:
-        raise SkipTest("Tests require a single U2FHID device")
-    return devs[0]
+class HidTest(unittest.TestCase):
+    def get_device(self):
+        devs = list_devices()
+        if len(devs) != 1:
+            raise Exception("Tests require a single U2F HID device")
+        return devs[0]
 
+    def test_open_close(self):
+        dev = self.get_device()
+        for i in xrange(0, 10):
+            dev.open()
+            dev.close()
 
-def test_open_close():
-    dev = get_device()
-    for i in xrange(0, 10):
-        dev.open()
-        dev.close()
-
-
-def test_echo():
-    msg1 = 'hello world!'
-    msg2 = '            '
-    msg3 = ''
-    with get_device() as dev:
-        resp1 = dev.send_apdu(0x40, 0, 0, msg1)
-        resp2 = dev.send_apdu(0x40, 0, 0, msg2)
-        resp3 = dev.send_apdu(0x40, 0, 0, msg3)
-    assert resp1 == msg1
-    assert resp2 == msg2
-    assert resp3 == msg3
+    def test_echo(self):
+        msg1 = 'hello world!'
+        msg2 = '            '
+        msg3 = ''
+        with self.get_device() as dev:
+            resp1 = dev.send_apdu(0x40, 0, 0, msg1)
+            resp2 = dev.send_apdu(0x40, 0, 0, msg2)
+            resp3 = dev.send_apdu(0x40, 0, 0, msg3)
+        assert resp1 == msg1
+        assert resp2 == msg2
+        assert resp3 == msg3
