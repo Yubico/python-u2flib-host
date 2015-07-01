@@ -14,7 +14,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from u2flib_host import u2f, exc
+from u2flib_host import u2f, exc, __version__
 from u2flib_host.constants import APDU_USE_NOT_SATISFIED
 from u2flib_host.utils import u2str
 import time
@@ -65,6 +65,8 @@ def parse_args():
         "the resulting RegistrationResponse on stdout.",
         add_help=True
     )
+    parser.add_argument('-v', '--version', action='version',
+                        version='%(prog)s ' + __version__)
     parser.add_argument('facet', help='the facet for registration')
     parser.add_argument('-i', '--infile', help='specify a file to read '
                         'RegistrationRequest from, instead of stdin')
