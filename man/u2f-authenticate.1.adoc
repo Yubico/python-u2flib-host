@@ -8,7 +8,7 @@ u2f\-authenticate(1)
 u2f-authenticate - Command-line tool for authentication using a U2F device.
 
 == Synopsis
-*u2f-authenticate* [--help] [--infile file] [--outfile file] [--check] [--soft file] facet
+*u2f-authenticate* [-h] [-v] [-c] [-i INFILE] [-o OUTFILE] [-s SOFT] facet
 
 == Description
 Signs  a  U2F  challenge using an attached U2F device.  Takes a JSON formatted
@@ -19,6 +19,9 @@ u2f-authenticate has the following options:
 
 *-h, --help*::
     Shows a list of available sub commands and arguments.
+
+*-v, --version*::
+    Shows the program's version number and exits.
 
 *-i, --infile FILENAME*::
     A file to read registration data from, instead of stdin.

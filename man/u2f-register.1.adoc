@@ -8,7 +8,7 @@ u2f\-register(1)
 u2f-register - Command-line tool for registering a U2F device.
 
 == Synopsis
-*u2f-register* [--help] [--infile file] [--outfile file] facet
+*u2f-register* [-h] [-v] [-i INFILE] [-o OUTFILE] [-s SOFT] facet
 
 == Description
 Register a U2F device. Takes a JSON formatted RegisterRequest object on stdin,
@@ -19,6 +19,9 @@ u2f-register has the following options:
 
 *-h, --help*::
     Shows a list of available sub commands and arguments.
+
+*-v, --version*::
+    Shows the program's version number and exits.
 
 *-i, --infile FILENAME*::
     A file to read registration data from, instead of stdin.
