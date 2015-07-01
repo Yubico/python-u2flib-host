@@ -14,10 +14,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from u2flib_host import u2f_v2
-from u2flib_host import ccid_transport, hid_transport
+from u2flib_host import hid_transport
 
 TRANSPORTS = [
-    ccid_transport,
     hid_transport
 ]
 

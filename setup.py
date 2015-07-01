@@ -40,7 +40,7 @@ setup(
     packages=['u2flib_host'],
     scripts=['scripts/u2f-register', 'scripts/u2f-authenticate'],
     setup_requires=['nose>=1.0'],
-    install_requires=['pyscard', 'requests', 'hidapi>=0.7.99'],
+    install_requires=['requests', 'hidapi>=0.7.99'],
     test_suite='nose.collector',
     tests_require=['M2Crypto'],
     cmdclass={'release': release},
