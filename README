@@ -6,15 +6,8 @@ the register and authenticated commands of U2F as defined in the
 http://fidoalliance.org/specifications/download[FIDO specifications].
 
 === License ===
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+This project is licensed under the BSD 2-clause license.
+See the COPYING file for the full license text.
 
 === Installation ===
 u2flib-host is installable by running the following command:
