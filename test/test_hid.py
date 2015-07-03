@@ -33,7 +33,7 @@ class HidTest(unittest.TestCase):
     def get_device(self):
         devs = list_devices()
         if len(devs) != 1:
-            raise Exception("Tests require a single U2F HID device")
+            self.skipTest("Tests require a single U2F HID device")
         return devs[0]
 
     def test_open_close(self):
