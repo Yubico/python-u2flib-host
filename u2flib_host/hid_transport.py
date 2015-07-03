@@ -70,7 +70,7 @@ def list_devices():
         if usage_page == 0xf1d0 and d['usage'] == 1:
             devices.append(HIDDevice)
         # Usage page doesn't work on Linux
-        elif usage_page == 0 and (d['vendor_id'], d['product_id']) in DEVICES:
+        elif (d['vendor_id'], d['product_id']) in DEVICES:
             device = HIDDevice(d['path'])
             try:
                 device.open()
