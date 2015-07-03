@@ -25,6 +25,8 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", \
 ----
 
 === Dependencies ===
+u2flib-host is compatible with Python 2.7.
+
 To support HID devices, u2flib-host uses hidapi, which has a few dependencies
 for building. On a Debian based system, run the following command before
 installation:
