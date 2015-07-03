@@ -47,9 +47,6 @@ class HidTest(unittest.TestCase):
         msg2 = '            '
         msg3 = ''
         with self.get_device() as dev:
-            resp1 = dev.send_apdu(0x40, 0, 0, msg1)
-            resp2 = dev.send_apdu(0x40, 0, 0, msg2)
-            resp3 = dev.send_apdu(0x40, 0, 0, msg3)
-        assert resp1 == msg1
-        assert resp2 == msg2
-        assert resp3 == msg3
+            self.assertEqual(dev.send_apdu(0x40, 0, 0, msg1), msg1)
+            self.assertEqual(dev.send_apdu(0x40, 0, 0, msg2), msg2)
+            self.assertEqual(dev.send_apdu(0x40, 0, 0, msg3), msg3)
