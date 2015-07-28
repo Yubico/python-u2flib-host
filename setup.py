@@ -40,6 +40,10 @@ setup(
     scripts=['scripts/u2f-register', 'scripts/u2f-authenticate'],
     install_requires=['requests', 'hidapi>=0.7.99'],
     test_suite='test',
+    tests_require=['M2Crypto'],
+    extras_require={
+        'soft_device': ['M2Crypto'],
+    },
     classifiers=[
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',

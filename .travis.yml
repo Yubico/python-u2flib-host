@@ -1,0 +1,18 @@
+language: python
+
+python:
+  - 2.7
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+
+install:
+  - pip install -r dev-requirements.txt
+  - pip install -e .
+
+script:
+  - coverage run setup.py test
+
+after_success:
+  - coveralls

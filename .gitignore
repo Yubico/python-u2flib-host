@@ -7,3 +7,9 @@ dist/
 .ropeproject/
 ChangeLog
 man/*.1
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
