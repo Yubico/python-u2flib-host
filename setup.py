@@ -25,7 +25,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from u2flib_host.yubicommon.setup import setup
+from u2flib_host.yubicommon.setup import setup, find_packages
 
 
 setup(
@@ -36,7 +36,7 @@ setup(
     maintainer='Yubico Open Source Maintainers',
     maintainer_email='ossmaint@yubico.com',
     url='https://github.com/Yubico/python-u2flib-host',
-    packages=['u2flib_host'],
+    packages=find_packages(include=['u2flib_host', 'u2flib_host.yubicommon']),
     scripts=['scripts/u2f-register', 'scripts/u2f-authenticate'],
     install_requires=['requests', 'hidapi>=0.7.99'],
     test_suite='test',
