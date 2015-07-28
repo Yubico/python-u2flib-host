@@ -19,6 +19,7 @@ addons:
       - swig
 
 install:
+  - pip install "pip>=7.0.2" wheel
   - pip install -r dev-requirements.txt
   - pip install -e .
 
