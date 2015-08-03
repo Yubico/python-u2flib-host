@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (c) 2013 Yubico AB
 # All rights reserved.
 #
@@ -89,7 +88,7 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+def main():
     args = parse_args()
 
     facet = unicode(args.facet, sys.stdin.encoding or sys.getdefaultencoding())
@@ -116,3 +115,7 @@ if __name__ == '__main__':
     else:
         sys.stderr.write('\n---Result---\n')
         print json.dumps(result)
+
+
+if __name__ == '__main__':
+    main()

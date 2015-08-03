@@ -37,9 +37,14 @@ setup(
     maintainer_email='ossmaint@yubico.com',
     url='https://github.com/Yubico/python-u2flib-host',
     packages=['u2flib_host'],
-    scripts=['scripts/u2f-register', 'scripts/u2f-authenticate'],
     install_requires=['requests', 'hidapi>=0.7.99'],
     test_suite='test',
+    entry_points={
+        'console_scripts': [
+            'u2f-register=u2flib_host.register:main',
+            'u2f-authenticate=u2flib_host.authenticate:main',
+        ],
+    },
     classifiers=[
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
