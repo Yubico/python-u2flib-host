@@ -36,7 +36,6 @@ setup(
     maintainer='Yubico Open Source Maintainers',
     maintainer_email='ossmaint@yubico.com',
     url='https://github.com/Yubico/python-u2flib-host',
-    packages=['u2flib_host'],
     install_requires=['requests', 'hidapi>=0.7.99'],
     test_suite='test',
     entry_points={
