@@ -1,0 +1,4 @@
+coverage
+coveralls
+Cython # For building hidapi in Tox and on Travis
+M2Crypto

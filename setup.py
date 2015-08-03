@@ -44,6 +44,10 @@ setup(
             'u2f-authenticate=u2flib_host.authenticate:main',
         ],
     },
+    tests_require=['M2Crypto'],
+    extras_require={
+        'soft_device': ['M2Crypto'],
+    },
     classifiers=[
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
