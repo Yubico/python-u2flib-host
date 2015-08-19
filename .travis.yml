@@ -1,5 +1,5 @@
 language: python
-sudo: required
+sudo: false
 
 python:
   - 2.7
@@ -8,12 +8,18 @@ cache:
   directories:
     - $HOME/.cache/pip
 
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libudev-dev libusb-1.0.0-dev
-  - sudo apt-get build-dep m2crypto
+addons:
+  apt:
+    packages:
+      - libudev-dev
+      - libusb-1.0-0-dev
+      - libssl-dev
+      - python-dev
+      - python-pip # Standin for python-setuptools, a build-dep of M2Crypto
+      - swig
 
 install:
+  - pip install "pip>=7.0.2" wheel
   - pip install -r dev-requirements.txt
   - pip install -e .
 
