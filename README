@@ -34,10 +34,10 @@ installation:
   # apt-get install build-essential python-dev cython libusb-1.0-0-dev \
     libudev-dev
 
-The soft U2F device implementation requires M2Crypto. On Debian based systems
-it is easiest installed using:
+The soft U2F device implementation requires crytography, the build
+dependencies can be installed with
 
-  # apt-get install python-m2crypto
+  # apt-get install libffi-dev libssl-dev
 
 === Examples ===
 ==== Library use ====

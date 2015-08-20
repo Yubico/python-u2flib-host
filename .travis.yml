@@ -13,9 +13,8 @@ addons:
     packages:
       - libudev-dev
       - libusb-1.0-0-dev
+      - libffi-dev
       - libssl-dev
-      - python-dev
-      - python-pip # Standin for python-setuptools, a build-dep of M2Crypto
       - swig
 
 install:
