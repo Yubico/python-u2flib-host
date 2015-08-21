@@ -26,9 +26,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 try:
-    from M2Crypto import EC, BIO
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.hazmat.primitives import hashes, serialization
+    from cryptography.hazmat.primitives.asymmetric import ec
 except ImportError:
-    print "The soft U2F token requires M2Crypto."
+    print "The soft U2F token requires cryptography."
     raise
 
 from u2flib_host.utils import H
@@ -39,7 +41,8 @@ import json
 import os
 import struct
 
-CURVE = EC.NID_X9_62_prime256v1
+# AKA NID_X9_62_prime256v1 in OpenSSL
+CURVE = ec.SECP256R1
 
 CERT = """
 MIIBhzCCAS6gAwIBAgIJAJm+6LEMouwcMAkGByqGSM49BAEwITEfMB0GA1UEAwwW
@@ -98,25 +101,37 @@ class SoftU2FDevice(U2FDevice):
         app_param = data[32:]
 
         # ECC key generation
-        privu = EC.gen_params(CURVE)
-        privu.gen_key()
-        pub_key = str(privu.pub().get_der())[-65:]
+        privu = ec.generate_private_key(CURVE(), default_backend())
+        pubu = privu.public_key()
+        pub_key_der = pubu.public_bytes(
+            serialization.Encoding.DER,
+            serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
+        pub_key = pub_key_der[-65:]
 
         # Store
         key_handle = os.urandom(64)
-        bio = BIO.MemoryBuffer()
-        privu.save_key_bio(bio, None)
+        priv_key_pem = privu.private_bytes(
+            serialization.Encoding.PEM,
+            serialization.PrivateFormat.PKCS8,
+            serialization.NoEncryption(),
+        )
         self.data['keys'][key_handle.encode('hex')] = {
-            'priv_key': bio.read_all(),
+            'priv_key': priv_key_pem,
             'app_param': app_param.encode('hex')
         }
         self._persist()
 
         # Attestation signature
-        cert_priv = EC.load_key_bio(BIO.MemoryBuffer(CERT_PRIV))
         cert = CERT
-        digest = H(chr(0x00) + app_param + client_param + key_handle + pub_key)
-        signature = cert_priv.sign_dsa_asn1(digest)
+        cert_priv = serialization.load_pem_private_key(
+            CERT_PRIV, password=None, backend=default_backend(),
+        )
+        signer = cert_priv.signer(ec.ECDSA(hashes.SHA256()))
+        signer.update(
+            chr(0x00) + app_param + client_param + key_handle + pub_key
+        )
+        signature = signer.finalize()
 
         raw_response = chr(0x05) + pub_key + chr(len(key_handle)) + \
             key_handle + cert + signature
@@ -136,7 +151,9 @@ class SoftU2FDevice(U2FDevice):
         if app_param != unwrapped['app_param'].decode('hex'):
             raise ValueError("Incorrect app param!")
         priv_pem = unwrapped['priv_key'].encode('ascii')
-        privu = EC.load_key_bio(BIO.MemoryBuffer(priv_pem))
+        privu = serialization.load_pem_private_key(
+            priv_pem, password=None, backend=default_backend(),
+        )
 
         # Increment counter
         self.data['counter'] += 1
@@ -146,8 +163,9 @@ class SoftU2FDevice(U2FDevice):
         touch = chr(1)  # Always indicate user presence
         counter = struct.pack('>I', self.data['counter'])
 
-        digest = H(app_param + touch + counter + client_param)
-        signature = privu.sign_dsa_asn1(digest)
+        signer = privu.signer(ec.ECDSA(hashes.SHA256()))
+        signer.update(app_param + touch + counter + client_param)
+        signature = signer.finalize()
         raw_response = touch + counter + signature
 
         return raw_response
