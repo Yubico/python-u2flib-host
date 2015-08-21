@@ -1,4 +1,5 @@
-* Version 2.2.1 (unreleased)
+* Version 2.3.0 (unreleased)
+ ** Replace M2Crypto with Cryptography.
 
 * Version 2.2.0 (released 2015-07-01)
  ** License change: Changed license to BSD 2-clause.
