@@ -1,4 +1,6 @@
-* Version 2.2.1 (unreleased)
+* Version 2.2.1 (released 2015-09-08)
+ ** Fix setup.py so that installation works properly.
+ ** Packaging related improvements.
 
 * Version 2.2.0 (released 2015-07-01)
  ** License change: Changed license to BSD 2-clause.
