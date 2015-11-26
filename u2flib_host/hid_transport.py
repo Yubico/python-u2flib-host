@@ -61,9 +61,6 @@ U2FHID_YUBIKEY_DEVICE_CONFIG = U2F_VENDOR_FIRST
 
 STAT_ERR = 0xbf
 
-TIMEOUT = 1000
-
-
 def list_devices():
     devices = []
     for d in hid.enumerate(0, 0):
@@ -82,7 +79,7 @@ def list_devices():
     return devices
 
 
-def _read_timeout(dev, size, timeout=1.0):
+def _read_timeout(dev, size, timeout=2.0):
     timeout += time()
     while time() < timeout:
         resp = dev.read(size)
