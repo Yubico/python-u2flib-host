@@ -46,6 +46,7 @@ DEVICES = [
     (0x1050, 0x0403),  # YubiKey 4 OTP+U2F
     (0x1050, 0x0406),  # YubiKey 4 U2F+CCID
     (0x1050, 0x0407),  # YubiKey 4 OTP+U2F+CCID
+    (0x2581, 0xf1d0),  # Plug-Up U2F Security Key
 ]
 HID_RPT_SIZE = 64
 
