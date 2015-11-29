@@ -68,7 +68,7 @@ def list_devices():
     for d in hid.enumerate(0, 0):
         usage_page = d['usage_page']
         if usage_page == 0xf1d0 and d['usage'] == 1:
-            devices.append(HIDDevice)
+            devices.append(HIDDevice(d['path']))
         # Usage page doesn't work on Linux
         elif (d['vendor_id'], d['product_id']) in DEVICES:
             device = HIDDevice(d['path'])
