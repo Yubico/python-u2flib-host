@@ -46,6 +46,7 @@ DEVICES = [
     (0x1050, 0x0403),  # YubiKey 4 OTP+U2F
     (0x1050, 0x0406),  # YubiKey 4 U2F+CCID
     (0x1050, 0x0407),  # YubiKey 4 OTP+U2F+CCID
+    (0x2581, 0xf1d0),  # Plug-Up U2F Security Key
 ]
 HID_RPT_SIZE = 64
 
@@ -59,9 +60,6 @@ CMD_APDU = 0x03
 U2FHID_YUBIKEY_DEVICE_CONFIG = U2F_VENDOR_FIRST
 
 STAT_ERR = 0xbf
-
-TIMEOUT = 1000
-
 
 def list_devices():
     devices = []
@@ -81,7 +79,7 @@ def list_devices():
     return devices
 
 
-def _read_timeout(dev, size, timeout=1.0):
+def _read_timeout(dev, size, timeout=2.0):
     timeout += time()
     while time() < timeout:
         resp = dev.read(size)
