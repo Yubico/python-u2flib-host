@@ -108,7 +108,8 @@ class HIDDevice(U2FDevice):
         self.cid = "ffffffff".decode('hex')
 
     def open(self):
-        self.handle = hid.device(None, None, path=self.path)
+        self.handle = hid.device()
+        self.handle.open_path(self.path)
         self.handle.set_nonblocking(True)
         self.init()
 
