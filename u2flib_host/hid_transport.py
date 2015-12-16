@@ -165,7 +165,7 @@ class HIDDevice(U2FDevice):
         while resp and resp[:5] != header:
             resp = ''.join(map(chr, _read_timeout(self.handle, HID_RPT_SIZE)))
             if resp[:5] == cid + chr(STAT_ERR):
-                raise U2FHIDError(ord(resp[6]))
+                raise U2FHIDError(ord(resp[7]))
 
         if not resp:
             raise exc.DeviceError("Invalid response from device!")
