@@ -65,19 +65,20 @@ STAT_ERR = 0xbf
 TIMEOUT = 1000
 
 
-def list_devices():
+def list_devices(dev_class=None):
+    dev_class = dev_class or HIDDevice
     devices = []
     for d in hid.enumerate(0, 0):
         usage_page = d['usage_page']
         if usage_page == 0xf1d0 and d['usage'] == 1:
-            devices.append(HIDDevice(d['path']))
+            devices.append(dev_class(d['path']))
         # Usage page doesn't work on Linux
         elif (d['vendor_id'], d['product_id']) in DEVICES:
             device = HIDDevice(d['path'])
             try:
                 device.open()
                 device.close()
-                devices.append(HIDDevice(d['path']))
+                devices.append(dev_class(d['path']))
             except exc.DeviceError:
                 pass
     return devices
