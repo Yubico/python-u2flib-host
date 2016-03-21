@@ -39,7 +39,7 @@ __all__ = [
 
 
 def u2str(data):
-    """Recursivly converts unicode object to UTF-8 formatted strings."""
+    """Recursively converts unicode objects to UTF-8 encoded byte strings."""
     if isinstance(data, dict):
         return {u2str(k): u2str(v) for k, v in data.items()}
     elif isinstance(data, list):
