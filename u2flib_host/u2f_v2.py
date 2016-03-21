@@ -28,6 +28,8 @@
 from u2flib_host.constants import INS_ENROLL, INS_SIGN
 from u2flib_host.utils import websafe_decode, websafe_encode, H
 from u2flib_host.appid import verify_facet
+from u2flib_host.yubicommon.compat import string_types
+
 import json
 
 VERSION = 'U2F_V2'
@@ -45,7 +47,7 @@ def register(device, data, facet):
 
     """
 
-    if isinstance(data, basestring):
+    if isinstance(data, string_types):
         data = json.loads(data)
 
     if data['version'] != VERSION:
@@ -88,7 +90,7 @@ def authenticate(device, data, facet, check_only=False):
 
     """
 
-    if isinstance(data, basestring):
+    if isinstance(data, string_types):
         data = json.loads(data)
 
     if data['version'] != VERSION:

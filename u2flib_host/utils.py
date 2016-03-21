@@ -25,6 +25,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from u2flib_host.yubicommon.compat import text_type
+
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from hashlib import sha256
 
@@ -42,7 +44,7 @@ def u2str(data):
         return {u2str(k): u2str(v) for k, v in data.iteritems()}
     elif isinstance(data, list):
         return [u2str(x) for x in data]
-    elif isinstance(data, unicode):
+    elif isinstance(data, text_type):
         return data.encode('utf-8')
     else:
         return data
