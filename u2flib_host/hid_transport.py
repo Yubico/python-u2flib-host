@@ -25,6 +25,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import print_function
+
 import os
 try:
     import hidraw as hid  # Prefer hidraw
@@ -119,7 +121,7 @@ class HIDDevice(U2FDevice):
         nonce = os.urandom(8)
         resp = self.call(CMD_INIT, nonce)
         while resp[:8] != nonce:
-            print "Wrong nonce, read again..."
+            print("Wrong nonce, read again...")
             resp = self._read_resp(self.cid, CMD_INIT)
         self.cid = resp[8:12]
 

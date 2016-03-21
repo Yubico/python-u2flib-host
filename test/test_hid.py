@@ -38,7 +38,7 @@ class HidTest(unittest.TestCase):
 
     def test_open_close(self):
         dev = self.get_device()
-        for i in xrange(0, 10):
+        for i in range(0, 10):
             dev.open()
             dev.close()
 
