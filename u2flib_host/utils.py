@@ -51,14 +51,16 @@ def u2str(data):
 
 
 def websafe_decode(data):
-    if isinstance(data, unicode):
-        data = data.encode('utf-8')
-    data += '=' * (-len(data) % 4)
+    if isinstance(data, text_type):
+        data = data.encode('ascii')
+    data += b'=' * (-len(data) % 4)
     return urlsafe_b64decode(data)
 
 
 def websafe_encode(data):
-    return urlsafe_b64encode(data).replace('=', '')
+    if isinstance(data, text_type):
+        data = data.encode('ascii')
+    return urlsafe_b64encode(data).replace(b'=', b'').decode('ascii')
 
 
 def H(data):
