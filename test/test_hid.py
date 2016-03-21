@@ -43,9 +43,9 @@ class HidTest(unittest.TestCase):
             dev.close()
 
     def test_echo(self):
-        msg1 = 'hello world!'
-        msg2 = '            '
-        msg3 = ''
+        msg1 = b'hello world!'
+        msg2 = b'            '
+        msg3 = b''
         with self.get_device() as dev:
             self.assertEqual(dev.send_apdu(0x40, 0, 0, msg1), msg1)
             self.assertEqual(dev.send_apdu(0x40, 0, 0, msg2), msg2)
