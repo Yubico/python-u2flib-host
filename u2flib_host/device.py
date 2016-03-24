@@ -107,8 +107,8 @@ class U2FDevice(object):
         try:
             resp = self._do_send_apdu(apdu_data)
         except Exception as e:
-            # Wrap exception, keeping trace
-            raise exc.DeviceError(e), None, sys.exc_info()[2]
+            # TODO Use six.reraise if/when Six becomes an agreed dependency.
+            raise exc.DeviceError(e)
         status = struct.unpack('>H', resp[-2:])[0]
         data = resp[:-2]
         if status != APDU_OK:
