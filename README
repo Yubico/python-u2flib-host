@@ -25,7 +25,7 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", \
 ----
 
 === Dependencies ===
-u2flib-host is compatible with Python 2.7.
+u2flib-host is compatible with CPython 2.7, 3.3 onwards.
 
 To support HID devices, u2flib-host uses hidapi, which has a few dependencies
 for building. On a Debian based system, run the following command before
@@ -34,7 +34,7 @@ installation:
   # apt-get install build-essential python-dev cython libusb-1.0-0-dev \
     libudev-dev
 
-The soft U2F device implementation requires crytography, the build
+The soft U2F device implementation requires link:https://pypi.python.org/pypi/cryptography[cryptography], the build
 dependencies can be installed with
 
   # apt-get install libffi-dev libssl-dev

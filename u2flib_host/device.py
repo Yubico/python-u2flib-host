@@ -26,7 +26,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from u2flib_host.constants import APDU_OK
+from u2flib_host.yubicommon.compat import int2byte
 from u2flib_host import exc
+import struct
 import sys
 
 INS_GET_VERSION = 0x03
@@ -87,27 +89,27 @@ class U2FDevice(object):
         # Subclasses should implement this.
         raise NotImplementedError('_do_send_apdu not implemented!')
 
-    def send_apdu(self, ins, p1=0, p2=0, data=''):
+    def send_apdu(self, ins, p1=0, p2=0, data=b''):
         """
         Sends an APDU to the device, and waits for a response.
         """
         if data is None:
-            data = ''
+            data = b''
         elif isinstance(data, int):
-            data = chr(data)
+            data = int2byte(data)
 
         size = len(data)
         l0 = size >> 16 & 0xff
         l1 = size >> 8 & 0xff
         l2 = size & 0xff
-        apdu_data = "%c%c%c%c%c%c%c%s%c%c" % \
-            (0, ins, p1, p2, l0, l1, l2, data, 0x04, 0x00)
+        apdu_data = struct.pack('B B B B B B B %is B B' % size,
+                                0, ins, p1, p2, l0, l1, l2, data, 0x04, 0x00)
         try:
             resp = self._do_send_apdu(apdu_data)
         except Exception as e:
-            # Wrap exception, keeping trace
-            raise exc.DeviceError(e), None, sys.exc_info()[2]
-        status = int(resp[-2:].encode('hex'), 16)
+            # TODO Use six.reraise if/when Six becomes an agreed dependency.
+            raise exc.DeviceError(e)
+        status = struct.unpack('>H', resp[-2:])[0]
         data = resp[:-2]
         if status != APDU_OK:
             raise exc.APDUError(status)

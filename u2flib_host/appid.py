@@ -93,7 +93,7 @@ class AppIDVerifier(object):
 
     def valid_facets(self, app_id, facets):
         app_id_ls = self.least_specific(app_id)
-        return filter(lambda f: self.facet_is_valid(app_id_ls, f), facets)
+        return [f for f in facets if self.facet_is_valid(app_id_ls, f)]
 
     def facet_is_valid(self, app_id_ls, facet):
         # The scheme of URLs in ids must identify either an application

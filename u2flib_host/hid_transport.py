@@ -25,6 +25,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import print_function
+
 import os
 try:
     import hidraw as hid  # Prefer hidraw
@@ -32,6 +34,7 @@ except ImportError:
     import hid
 from time import time
 from u2flib_host.device import U2FDevice
+from u2flib_host.yubicommon.compat import byte2int, int2byte
 from u2flib_host import exc
 
 DEVICES = [
@@ -102,7 +105,7 @@ class HIDDevice(U2FDevice):
 
     def __init__(self, path):
         self.path = path
-        self.cid = "ffffffff".decode('hex')
+        self.cid = b"\xff\xff\xff\xff"
 
     def open(self):
         self.handle = hid.device()
@@ -119,12 +122,12 @@ class HIDDevice(U2FDevice):
         nonce = os.urandom(8)
         resp = self.call(CMD_INIT, nonce)
         while resp[:8] != nonce:
-            print "Wrong nonce, read again..."
+            print("Wrong nonce, read again...")
             resp = self._read_resp(self.cid, CMD_INIT)
         self.cid = resp[8:12]
 
     def set_mode(self, mode):
-        data = ("%02x0f0000" % mode).decode('hex')
+        data = mode + b"\x0f\x00\x00"
         self.call(U2FHID_YUBIKEY_DEVICE_CONFIG, data)
 
     def _do_send_apdu(self, apdu_data):
@@ -135,42 +138,44 @@ class HIDDevice(U2FDevice):
 
     def _send_req(self, cid, cmd, data):
         size = len(data)
-        bc_l = chr(size & 0xff)
-        bc_h = chr(size >> 8 & 0xff)
-        payload = cid + chr(TYPE_INIT | cmd) + bc_h + bc_l + \
+        bc_l = int2byte(size & 0xff)
+        bc_h = int2byte(size >> 8 & 0xff)
+        payload = cid + int2byte(TYPE_INIT | cmd) + bc_h + bc_l + \
             data[:HID_RPT_SIZE - 7]
-        payload += '\0' * (HID_RPT_SIZE - len(payload))
-        self.handle.write([0] + map(ord, payload))
+        payload += b'\0' * (HID_RPT_SIZE - len(payload))
+        self.handle.write([0] + [byte2int(c) for c in payload])
         data = data[HID_RPT_SIZE - 7:]
         seq = 0
         while len(data) > 0:
-            payload = cid + chr(0x7f & seq) + data[:HID_RPT_SIZE - 5]
-            payload += '\0' * (HID_RPT_SIZE - len(payload))
-            self.handle.write([0] + map(ord, payload))
+            payload = cid + int2byte(0x7f & seq) + data[:HID_RPT_SIZE - 5]
+            payload += b'\0' * (HID_RPT_SIZE - len(payload))
+            self.handle.write([0] + [byte2int(c) for c in payload])
             data = data[HID_RPT_SIZE - 5:]
             seq += 1
 
     def _read_resp(self, cid, cmd):
-        resp = '.'
-        header = cid + chr(TYPE_INIT | cmd)
+        resp = b'.'
+        header = cid + int2byte(TYPE_INIT | cmd)
         while resp and resp[:5] != header:
-            resp = ''.join(map(chr, _read_timeout(self.handle, HID_RPT_SIZE)))
-            if resp[:5] == cid + chr(STAT_ERR):
-                raise U2FHIDError(ord(resp[6]))
+            resp_vals = _read_timeout(self.handle, HID_RPT_SIZE)
+            resp = b''.join(int2byte(v) for v in resp_vals)
+            if resp[:5] == cid + int2byte(STAT_ERR):
+                raise U2FHIDError(byte2int(resp[6]))
 
         if not resp:
             raise exc.DeviceError("Invalid response from device!")
 
-        data_len = (ord(resp[5]) << 8) + ord(resp[6])
+        data_len = (byte2int(resp[5]) << 8) + byte2int(resp[6])
         data = resp[7:min(7 + data_len, HID_RPT_SIZE)]
         data_len -= len(data)
 
         seq = 0
         while data_len > 0:
-            resp = ''.join(map(chr, _read_timeout(self.handle, HID_RPT_SIZE)))
+            resp_vals = _read_timeout(self.handle, HID_RPT_SIZE)
+            resp = b''.join(int2byte(v) for v in resp_vals)
             if resp[:4] != cid:
                 raise exc.DeviceError("Wrong CID from device!")
-            if ord(resp[4]) != seq & 0x7f:
+            if byte2int(resp[4:5]) != seq & 0x7f:
                 raise exc.DeviceError("Wrong SEQ from device!")
             seq += 1
             new_data = resp[5:min(5 + data_len, HID_RPT_SIZE)]
@@ -178,9 +183,9 @@ class HIDDevice(U2FDevice):
             data += new_data
         return data
 
-    def call(self, cmd, data=''):
+    def call(self, cmd, data=b''):
         if isinstance(data, int):
-            data = chr(data)
+            data = int2byte(data)
 
         self._send_req(self.cid, cmd, data)
         return self._read_resp(self.cid, cmd)

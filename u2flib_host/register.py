@@ -25,9 +25,13 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import print_function
+
 from u2flib_host import u2f, exc, __version__
 from u2flib_host.constants import APDU_USE_NOT_SATISFIED
 from u2flib_host.utils import u2str
+from u2flib_host.yubicommon.compat import text_type
+
 import time
 import json
 import argparse
@@ -91,7 +95,7 @@ def parse_args():
 def main():
     args = parse_args()
 
-    facet = unicode(args.facet, sys.stdin.encoding or sys.getdefaultencoding())
+    facet = text_type(args.facet, sys.stdin.encoding or sys.getdefaultencoding())
     if args.infile:
         with open(args.infile, 'r') as f:
             data = f.read()
@@ -114,7 +118,7 @@ def main():
         sys.stderr.write('Output written to %s\n' % args.outfile)
     else:
         sys.stderr.write('\n---Result---\n')
-        print json.dumps(result)
+        print(json.dumps(result))
 
 
 if __name__ == '__main__':
