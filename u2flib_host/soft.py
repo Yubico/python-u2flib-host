@@ -35,7 +35,6 @@ except ImportError:
     print("The soft U2F token requires cryptography.")
     raise
 
-from u2flib_host.utils import H
 from u2flib_host.device import U2FDevice
 from u2flib_host.constants import INS_ENROLL, INS_SIGN
 from u2flib_host.yubicommon.compat import byte2int, int2byte

@@ -1,12 +1,11 @@
 * Version 3.0.0 (unreleased)
- ** Added support for Python 3.3+
- ** utils.rand_bytes() now sources bytes from os.urandom()
+ ** Added support for Python 3.3+.
+ ** utils.rand_bytes() now sources bytes from os.urandom().
  ** utils.websafe_encode() now returns text strings (unicode() on Python 2.x,
-    str() on Python 3.x)
+    str() on Python 3.x).
+ ** utils.H() has been removed (just use hashlib.sha256() directly instead).
  ** soft.SoftU2FDevice() now stores keys, key handles and app params as text
-    strings
-
-* Version 2.3.0 (unreleased)
+    strings.
  ** Replace M2Crypto with Cryptography.
 
 * Version 2.2.1 (released 2015-09-08)

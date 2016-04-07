@@ -5,8 +5,7 @@ import unittest
 from u2flib_host.utils import (
     u2str,
     websafe_encode,
-    websafe_decode,
-    H,
+    websafe_decode
 )
 
 
@@ -56,14 +55,3 @@ class TestWebSafe(unittest.TestCase):
     def test_websafe_encode_unicode(self):
         self.assertEqual(websafe_encode(u''), u'')
         self.assertEqual(websafe_encode(u'foobar'), u'Zm9vYmFy')
-
-
-class TestH(unittest.TestCase):
-    # SHA-256 vectors adapted from http://www.nsrl.nist.gov/testdata/
-
-    def test_H(self):
-        self.assertEqual(H(b'abc'),
-            b'\xbax\x16\xbf\x8f\x01\xcf\xeaAA@\xde]\xae"#\xb0'
-            b'\x03a\xa3\x96\x17z\x9c\xb4\x10\xffa\xf2\x00\x15\xad'
-        )
-

@@ -26,10 +26,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from u2flib_host.constants import INS_ENROLL, INS_SIGN
-from u2flib_host.utils import websafe_decode, websafe_encode, H
+from u2flib_host.utils import websafe_decode, websafe_encode
 from u2flib_host.appid import verify_facet
 from u2flib_host.yubicommon.compat import string_types
 
+from hashlib import sha256
 import json
 
 VERSION = 'U2F_V2'
@@ -55,7 +56,7 @@ def register(device, data, facet):
 
     app_id = data.get('appId', facet)
     verify_facet(app_id, facet)
-    app_param = H(app_id)
+    app_param = sha256(app_id).digest()
 
     client_data = {
         'typ': 'navigator.id.finishEnrollment',
@@ -63,7 +64,7 @@ def register(device, data, facet):
         'origin': facet
     }
     client_data = json.dumps(client_data)
-    client_param = H(client_data)
+    client_param = sha256(client_data).digest()
 
     request = client_param + app_param
 
@@ -98,7 +99,7 @@ def authenticate(device, data, facet, check_only=False):
 
     app_id = data.get('appId', facet)
     verify_facet(app_id, facet)
-    app_param = H(app_id)
+    app_param = sha256(app_id).digest()
 
     key_handle = websafe_decode(data['keyHandle'])
 
@@ -109,7 +110,7 @@ def authenticate(device, data, facet, check_only=False):
         'origin': facet
     }
     client_data = json.dumps(client_data)
-    client_param = H(client_data)
+    client_param = sha256(client_data).digest()
 
     request = client_param + app_param + chr(
         len(key_handle)) + key_handle

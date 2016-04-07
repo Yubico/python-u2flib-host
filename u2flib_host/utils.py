@@ -33,8 +33,7 @@ from hashlib import sha256
 __all__ = [
     'u2str',
     'websafe_encode',
-    'websafe_decode',
-    'H'
+    'websafe_decode'
 ]
 
 
@@ -61,9 +60,3 @@ def websafe_encode(data):
     if isinstance(data, text_type):
         data = data.encode('ascii')
     return urlsafe_b64encode(data).replace(b'=', b'').decode('ascii')
-
-
-def H(data):
-    f = sha256()
-    f.update(data)
-    return f.digest()
