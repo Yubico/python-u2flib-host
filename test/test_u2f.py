@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Yubico AB
+# Copyright (c) 2016 Yubico AB
 # All rights reserved.
 #
 #   Redistribution and use in source and binary forms, with or
@@ -25,50 +25,40 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from u2flib_host import u2f_v2
-from u2flib_host import hid_transport
-from u2flib_host.yubicommon.compat import string_types
-
-import json
-
-TRANSPORTS = [
-    hid_transport
-]
-
-LIB_VERSIONS = {
-    'U2F_V2': u2f_v2
-}
+from u2flib_host import u2f, u2f_v2
+import unittest
 
 
-def list_devices():
-    # Combine list_devices for all transports, ignoring exceptions.
-    devices = []
-    for transport in TRANSPORTS:
-        try:
-            devices.extend(transport.list_devices())
-        except:
-            pass
-    return devices
+class MockDevice(object):
+
+    def __init__(self, *versions):
+        self._versions = versions
+
+    def get_supported_versions(self):
+        return self._versions
+
+    def send_apdu(self, ins, p1, p2, request):
+        return b''
 
 
-def get_lib(device, data):
-    if isinstance(data, string_types):
-        data = json.loads(data)
+class TestU2F(unittest.TestCase):
 
-    version = data['version']
-    if version not in device.get_supported_versions():
-        raise ValueError("Device does not support U2F version: %s" % version)
-    if version not in LIB_VERSIONS:
-        raise ValueError("Library does not support U2F version: %s" % version)
+    def test_get_lib_supported(self):
+        lib = u2f.get_lib(MockDevice('U2F_V2'), {'version': 'U2F_V2'})
+        self.assertEqual(lib, u2f_v2)
 
-    return LIB_VERSIONS[version]
+        lib = u2f.get_lib(MockDevice('foo', 'U2F_V2'), {'version': 'U2F_V2'})
+        self.assertEqual(lib, u2f_v2)
 
+        lib = u2f.get_lib(MockDevice('U2F_V2', 'bar'), {'version': 'U2F_V2'})
+        self.assertEqual(lib, u2f_v2)
 
-def register(device, data, facet):
-    lib = get_lib(device, data)
-    return lib.register(device, data, facet)
+    def test_get_lib_unsupported_by_device(self):
+        self.assertRaises(ValueError, u2f.get_lib,
+                          MockDevice('unknown', 'versions'),
+                          {'version': 'U2F_V2'})
 
-
-def authenticate(device, data, facet, check_only=False):
-    lib = get_lib(device, data)
-    return lib.authenticate(device, data, facet, check_only)
+    def test_get_lib_unsupported_by_lib(self):
+        self.assertRaises(ValueError, u2f.get_lib,
+                          MockDevice('U2F_V2'),
+                          {'version': 'invalid_version'})
