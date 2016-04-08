@@ -25,13 +25,10 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from u2flib_host.constants import APDU_OK
+from u2flib_host.constants import APDU_OK, INS_GET_VERSION
 from u2flib_host.yubicommon.compat import int2byte
 from u2flib_host import exc
 import struct
-import sys
-
-INS_GET_VERSION = 0x03
 
 
 class U2FDevice(object):
