@@ -1,4 +1,4 @@
-* Version 3.0.0 (unreleased)
+* Version 3.0.0 (released 2016-04-11)
  ** Added support for Python 3.3+.
  ** utils.rand_bytes() now sources bytes from os.urandom().
  ** utils.websafe_encode() now returns text strings (unicode() on Python 2.x,
