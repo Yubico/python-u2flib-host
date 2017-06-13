@@ -110,7 +110,7 @@ def main():
     else:
         if sys.stdin.isatty():
             sys.stderr.write('Enter AuthenticateRequest JSON data...\n')
-        data = sys.stdin.readline()
+        data = sys.stdin.read()
 
     params = json.loads(data)
     if args.soft:
