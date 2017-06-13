@@ -72,7 +72,7 @@ class U2FDevice(object):
         """
         if not hasattr(self, '_versions'):
             try:
-                self._versions = [self.send_apdu(INS_GET_VERSION)]
+                self._versions = [self.send_apdu(INS_GET_VERSION).decode()]
             except exc.APDUError as e:
                 # v0 didn't support the instruction.
                 self._versions = ['v0'] if e.code == 0x6d00 else []
