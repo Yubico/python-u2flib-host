@@ -147,7 +147,7 @@ class HIDDevice(U2FDevice):
         return resp
 
     def lock(self, lock_time=10):
-        self.call(CMD_LOCK, chr(lock_time))
+        self.call(CMD_LOCK, lock_time)
 
     def _send_req(self, cid, cmd, data):
         size = len(data)
