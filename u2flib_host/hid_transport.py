@@ -59,24 +59,28 @@ U2F_VENDOR_FIRST = 0x40
 # USB Commands
 CMD_INIT = 0x06
 CMD_WINK = 0x08
+CMD_PING = 0x01
 CMD_APDU = 0x03
+CMD_LOCK = 0x04
 U2FHID_YUBIKEY_DEVICE_CONFIG = U2F_VENDOR_FIRST
 
 STAT_ERR = 0xbf
 
-def list_devices():
+
+def list_devices(dev_class=None):
+    dev_class = dev_class or HIDDevice
     devices = []
     for d in hid.enumerate(0, 0):
         usage_page = d['usage_page']
         if usage_page == 0xf1d0 and d['usage'] == 1:
-            devices.append(HIDDevice(d['path']))
+            devices.append(dev_class(d['path']))
         # Usage page doesn't work on Linux
         elif (d['vendor_id'], d['product_id']) in DEVICES:
             device = HIDDevice(d['path'])
             try:
                 device.open()
                 device.close()
-                devices.append(HIDDevice(d['path']))
+                devices.append(dev_class(d['path']))
             except exc.DeviceError:
                 pass
     return devices
@@ -136,6 +140,15 @@ class HIDDevice(U2FDevice):
     def wink(self):
         self.call(CMD_WINK)
 
+    def ping(self, msg=b'Hello U2F'):
+        resp = self.call(CMD_PING, msg)
+        if resp != msg:
+            raise exc.DeviceError("Incorrect PING readback")
+        return resp
+
+    def lock(self, lock_time=10):
+        self.call(CMD_LOCK, chr(lock_time))
+
     def _send_req(self, cid, cmd, data):
         size = len(data)
         bc_l = int2byte(size & 0xff)
@@ -160,7 +173,7 @@ class HIDDevice(U2FDevice):
             resp_vals = _read_timeout(self.handle, HID_RPT_SIZE)
             resp = b''.join(int2byte(v) for v in resp_vals)
             if resp[:5] == cid + int2byte(STAT_ERR):
-                raise U2FHIDError(byte2int(resp[6]))
+                raise U2FHIDError(byte2int(resp[7]))
 
         if not resp:
             raise exc.DeviceError("Invalid response from device!")
