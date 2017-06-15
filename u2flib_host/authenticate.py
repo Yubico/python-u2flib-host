@@ -103,7 +103,7 @@ def parse_args():
 def main():
     args = parse_args()
 
-    facet = text_type(args.facet, sys.stdin.encoding or sys.getdefaultencoding())
+    facet = text_type(args.facet)
     if args.infile:
         with open(args.infile, 'r') as f:
             data = f.read()
@@ -112,8 +112,7 @@ def main():
             sys.stderr.write('Enter AuthenticateRequest JSON data...\n')
         data = sys.stdin.read()
 
-    params = json.loads(data, object_hook=u2str)
-
+    params = json.loads(data)
     if args.soft:
         from u2flib_host.soft import SoftU2FDevice
         devices = [SoftU2FDevice(args.soft)]

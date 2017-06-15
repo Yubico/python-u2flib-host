@@ -1,3 +1,6 @@
+* Version 3.0.1 (released 2017-06-14)
+ ** Improved Python 3 compatibility.
+
 * Version 3.0.0 (released 2016-04-11)
  ** Added support for Python 3.3+.
  ** utils.rand_bytes() now sources bytes from os.urandom().
