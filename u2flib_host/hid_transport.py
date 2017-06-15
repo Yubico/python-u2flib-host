@@ -77,7 +77,7 @@ def list_devices():
                 device.open()
                 device.close()
                 devices.append(HIDDevice(d['path']))
-            except exc.DeviceError:
+            except:
                 pass
     return devices
 
