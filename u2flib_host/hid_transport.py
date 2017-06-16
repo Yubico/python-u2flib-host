@@ -81,7 +81,7 @@ def list_devices(dev_class=None):
                 device.open()
                 device.close()
                 devices.append(dev_class(d['path']))
-            except:
+            except (exc.DeviceError, IOError, OSError):
                 pass
     return devices
 
