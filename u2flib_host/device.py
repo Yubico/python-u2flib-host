@@ -100,7 +100,7 @@ class U2FDevice(object):
         l1 = size >> 8 & 0xff
         l2 = size & 0xff
         apdu_data = struct.pack('B B B B B B B %is B B' % size,
-                                0, ins, p1, p2, l0, l1, l2, data, 0x04, 0x00)
+                                0, ins, p1, p2, l0, l1, l2, data, 0x00, 0x00)
         try:
             resp = self._do_send_apdu(apdu_data)
         except Exception as e:
