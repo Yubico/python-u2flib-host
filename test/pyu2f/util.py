@@ -19,8 +19,7 @@ that implements parts of the U2FHID frame protocol.  This makes it easy to tests
 of higher level abstractions without having to use mock to mock out low level
 framing details.
 """
-from pyu2f import hidtransport
-from pyu2f.hid import base
+from u2flib_host.pyu2f import base, hidtransport
 
 
 class UnsupportedCommandError(Exception):

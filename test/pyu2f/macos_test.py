@@ -18,8 +18,7 @@ import ctypes
 import sys
 import mock
 
-from pyu2f import errors
-from pyu2f.hid import macos
+from u2flib_host.pyu2f import macos, errors
 
 
 if sys.version_info[:2] < (2, 7):

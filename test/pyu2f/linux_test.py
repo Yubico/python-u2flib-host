@@ -21,7 +21,7 @@ import sys
 
 import mock
 
-from pyu2f.hid import linux
+from u2flib_host.pyu2f import linux
 
 try:
   from pyfakefs import fake_filesystem  # pylint: disable=g-import-not-at-top

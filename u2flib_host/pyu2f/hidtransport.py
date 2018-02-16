@@ -17,13 +17,16 @@
 This module imports the U2F HID Transport protocol as well as methods
 for discovering devices implementing this protocol.
 """
+
+from __future__ import absolute_import
+
 import logging
 import os
 import struct
 import time
 
-from pyu2f import errors
-from pyu2f import hid
+from . import errors, hid
+
 
 
 def HidUsageSelector(device):

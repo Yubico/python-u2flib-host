@@ -14,13 +14,14 @@
 
 """Implements raw HID device communication on Windows."""
 
+from __future__ import absolute_import
+
 import ctypes
 from ctypes import wintypes
 
 import platform
 
-from pyu2f import errors
-from pyu2f.hid import base
+from . import base, errors
 
 
 # Load relevant DLLs

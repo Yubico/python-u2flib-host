@@ -17,15 +17,19 @@
 This module implenets an interface for talking to low level hid devices
 using various methods on different platforms.
 """
+
+from __future__ import absolute_import
+
 import sys
 
 
-def Enumerate():
-  return InternalPlatformSwitch('Enumerate')
+class hid(object):
+  def Enumerate(self):
+    return InternalPlatformSwitch('Enumerate')
 
 
-def Open(path):
-  return InternalPlatformSwitch('__init__', path)
+  def Open(self, path):
+    return InternalPlatformSwitch('__init__', path)
 
 
 def InternalPlatformSwitch(funcname, *args, **kwargs):
@@ -33,13 +37,13 @@ def InternalPlatformSwitch(funcname, *args, **kwargs):
   # pylint: disable=g-import-not-at-top
   clz = None
   if sys.platform.startswith('linux'):
-    from pyu2f.hid import linux
+    from . import linux
     clz = linux.LinuxHidDevice
   elif sys.platform.startswith('win32'):
-    from pyu2f.hid import windows
+    from . import windows
     clz = windows.WindowsHidDevice
   elif sys.platform.startswith('darwin'):
-    from pyu2f.hid import macos
+    from . import macos
     clz = macos.MacOsHidDevice
 
   if not clz:

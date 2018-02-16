@@ -36,7 +36,7 @@ setup(
     maintainer='Yubico Open Source Maintainers',
     maintainer_email='ossmaint@yubico.com',
     url='https://github.com/Yubico/python-u2flib-host',
-    install_requires=['requests', 'hidapi>=0.7.99'],
+    install_requires=['six', 'requests', 'hidapi>=0.7.99'],
     test_suite='test',
     entry_points={
         'console_scripts': [
@@ -44,7 +44,7 @@ setup(
             'u2f-authenticate=u2flib_host.authenticate:main',
         ],
     },
-    tests_require=['cryptography>=1.0'],
+    tests_require=['cryptography>=1.0', 'mock>=1.0.1', 'pyfakefs>=2.4'],
     extras_require={
         'soft_device': ['cryptography>=1.0'],
     },

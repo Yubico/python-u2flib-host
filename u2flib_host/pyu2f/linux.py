@@ -14,11 +14,12 @@
 
 """Implements raw HID interface on Linux using SysFS and device files."""
 
+from __future__ import absolute_import
+
 import os
 import struct
 
-from pyu2f import errors
-from pyu2f.hid import base
+from . import base, errors
 
 REPORT_DESCRIPTOR_KEY_MASK = 0xfc
 LONG_ITEM_ENCODING = 0xfe

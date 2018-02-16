@@ -14,9 +14,11 @@
 
 """Tests for pyu2f.tests.lib.util."""
 
+from __future__ import absolute_import
+
 import sys
 
-from pyu2f.tests.lib import util
+from . import util
 
 if sys.version_info[:2] < (2, 7):
   import unittest2 as unittest  # pylint: disable=g-import-not-at-top
