@@ -27,16 +27,10 @@
 
 from __future__ import print_function
 
-import os
-try:
-    import hidraw as hid  # Prefer hidraw
-except ImportError:
-    import hid
-from time import time
+from .pyu2f import hidtransport
 from u2flib_host.device import U2FDevice
 from u2flib_host import exc
 import six
-import struct
 
 DEVICES = [
     (0x1050, 0x0200),  # Gnubby
@@ -68,32 +62,13 @@ U2FHID_YUBIKEY_DEVICE_CONFIG = U2F_VENDOR_FIRST
 STAT_ERR = 0xbf
 
 
-def list_devices(dev_class=None):
-    dev_class = dev_class or HIDDevice
-    devices = []
-    for d in hid.enumerate(0, 0):
-        usage_page = d['usage_page']
-        if usage_page == 0xf1d0 and d['usage'] == 1:
-            devices.append(dev_class(d['path']))
-        # Usage page doesn't work on Linux
-        elif (d['vendor_id'], d['product_id']) in DEVICES:
-            device = HIDDevice(d['path'])
-            try:
-                device.open()
-                device.close()
-                devices.append(dev_class(d['path']))
-            except (exc.DeviceError, IOError, OSError):
-                pass
-    return devices
+def _gen_devices(selector):
+    for dev in hidtransport.DiscoverLocalHIDU2FDevices(selector):
+        yield HIDDevice(dev)
 
 
-def _read_timeout(dev, size, timeout=2.0):
-    timeout += time()
-    while time() < timeout:
-        resp = dev.read(size)
-        if resp:
-            return resp
-    return []
+def list_devices(selector=hidtransport.HidUsageSelector):
+    return list(_gen_devices(selector))
 
 
 class U2FHIDError(Exception):
@@ -108,31 +83,11 @@ class HIDDevice(U2FDevice):
     U2FDevice implementation using the HID transport.
     """
 
-    def __init__(self, path):
-        self.path = path
-        self.cid = b"\xff\xff\xff\xff"
-
-    def open(self):
-        self.handle = hid.device()
-        self.handle.open_path(self.path)
-        self.handle.set_nonblocking(True)
-        self.init()
-
-    def close(self):
-        if hasattr(self, 'handle'):
-            self.handle.close()
-            del self.handle
-
-    def init(self):
-        nonce = os.urandom(8)
-        resp = self.call(CMD_INIT, nonce)
-        while resp[:8] != nonce:
-            print("Wrong nonce, read again...")
-            resp = self._read_resp(self.cid, CMD_INIT)
-        self.cid = resp[8:12]
+    def __init__(self, dev):
+        self._dev = dev
 
     def set_mode(self, mode):
-        data = mode + b"\x0f\x00\x00"
+        data = mode + b'\x0f\x00\x00'
         self.call(U2FHID_YUBIKEY_DEVICE_CONFIG, data)
 
     def _do_send_apdu(self, apdu_data):
@@ -150,54 +105,8 @@ class HIDDevice(U2FDevice):
     def lock(self, lock_time=10):
         self.call(CMD_LOCK, lock_time)
 
-    def _send_req(self, cid, cmd, data):
-        size = len(data)
-        payload = cid + struct.pack('>BH', TYPE_INIT | cmd, size) + \
-            data[:HID_RPT_SIZE - 7]
-        payload += b'\0' * (HID_RPT_SIZE - len(payload))
-        self.handle.write([0] + list(six.iterbytes(payload)))
-        data = data[HID_RPT_SIZE - 7:]
-        seq = 0
-        while len(data) > 0:
-            payload = cid + six.int2byte(0x7f & seq) + data[:HID_RPT_SIZE - 5]
-            payload += b'\0' * (HID_RPT_SIZE - len(payload))
-            self.handle.write([0] + list(six.iterbytes(payload)))
-            data = data[HID_RPT_SIZE - 5:]
-            seq += 1
-
-    def _read_resp(self, cid, cmd):
-        resp = b'.'
-        header = cid + six.int2byte(TYPE_INIT | cmd)
-        while resp and resp[:5] != header:
-            resp_vals = _read_timeout(self.handle, HID_RPT_SIZE)
-            resp = bytes(bytearray(resp_vals))
-            if resp[:5] == cid + six.int2byte(STAT_ERR):
-                raise U2FHIDError(six.indexbytes(resp, 7))
-
-        if not resp:
-            raise exc.DeviceError("Invalid response from device!")
-
-        data_len = struct.unpack('>H', resp[5:7])[0]
-        data = resp[7:min(7 + data_len, HID_RPT_SIZE)]
-        data_len -= len(data)
-
-        seq = 0
-        while data_len > 0:
-            resp_vals = _read_timeout(self.handle, HID_RPT_SIZE)
-            resp = bytes(bytearray(resp_vals))
-            if resp[:4] != cid:
-                raise exc.DeviceError("Wrong CID from device!")
-            if six.indexbytes(resp, 4) != seq & 0x7f:
-                raise exc.DeviceError("Wrong SEQ from device!")
-            seq += 1
-            new_data = resp[5:min(5 + data_len, HID_RPT_SIZE)]
-            data_len -= len(new_data)
-            data += new_data
-        return data
-
     def call(self, cmd, data=b''):
         if isinstance(data, int):
             data = six.int2byte(data)
 
-        self._send_req(self.cid, cmd, data)
-        return self._read_resp(self.cid, cmd)
+        return self._dev.InternalExchange(TYPE_INIT | cmd, data)

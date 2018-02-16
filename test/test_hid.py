@@ -36,12 +36,6 @@ class HidTest(unittest.TestCase):
             self.skipTest("Tests require a single U2F HID device")
         return devs[0]
 
-    def test_open_close(self):
-        dev = self.get_device()
-        for i in range(0, 10):
-            dev.open()
-            dev.close()
-
     def test_echo(self):
         msg1 = b'hello world!'
         msg2 = b'            '

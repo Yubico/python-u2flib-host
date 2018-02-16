@@ -24,11 +24,13 @@ import sys
 
 
 class hid(object):
-  def Enumerate(self):
+  @staticmethod
+  def Enumerate():
     return InternalPlatformSwitch('Enumerate')
 
 
-  def Open(self, path):
+  @staticmethod
+  def Open(path):
     return InternalPlatformSwitch('__init__', path)
 
 
