@@ -85,19 +85,19 @@ HANDLE = ctypes.c_void_p
 PHIDP_PREPARSED_DATA = ctypes.c_void_p  # pylint: disable=invalid-name
 
 # This is a HANDLE.
-INVALID_HANDLE_VALUE = 0xffffffffL
+INVALID_HANDLE_VALUE = 0xffffffff
 
 # Status codes
 NTSTATUS = ctypes.c_long
-HIDP_STATUS_SUCCESS = 0x00110000L
-FILE_SHARE_READ = 0x00000001L
-FILE_SHARE_WRITE = 0x00000002L
+HIDP_STATUS_SUCCESS = 0x00110000
+FILE_SHARE_READ = 0x00000001
+FILE_SHARE_WRITE = 0x00000002
 OPEN_EXISTING = 0x03
 ERROR_ACCESS_DENIED = 0x05
 
 # CreateFile Flags
-GENERIC_WRITE = 0x40000000L
-GENERIC_READ = 0x80000000L
+GENERIC_WRITE = 0x40000000
+GENERIC_READ = 0x80000000
 
 # Function signatures
 hid.HidD_GetHidGuid.restype = None
@@ -311,6 +311,8 @@ class WindowsHidDevice(base.HidDevice):
         FillDeviceAttributes(device, descriptor)
         FillDeviceCapabilities(device, descriptor)
         out.append(descriptor.ToPublicDict())
+      except Exception:
+        continue  # Try with next device
       finally:
         kernel32.CloseHandle(device)
 
@@ -336,7 +338,7 @@ class WindowsHidDevice(base.HidDevice):
     if len(packet) != self.GetOutReportDataLength():
       raise errors.HidError("Packet length must match report data length.")
 
-    out = "".join(map(chr, [0] + packet))  # Prepend the zero-byte (report ID)
+    out = bytes(bytearray([0] + packet))  # Prepend the zero-byte (report ID)
     num_written = wintypes.DWORD()
     ret = (
         kernel32.WriteFile(
@@ -364,4 +366,4 @@ class WindowsHidDevice(base.HidDevice):
 
     # Convert the string buffer to a list of numbers.  Throw away the first
     # byte, which is the report id (which we don't care about).
-    return map(ord, buf)[1:]
+    return b''.join(buf)[1:]

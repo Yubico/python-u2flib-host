@@ -46,6 +46,10 @@ def init_mock_get_int_property(mock_get_int_property):
 
 class MacOsTest(unittest.TestCase):
 
+  @classmethod
+  def setUpClass(cls):
+    macos.MacOsHidDevice.__del__ = lambda x: None
+
   @mock.patch.object(macos.threading, 'Thread')
   @mock.patch.multiple(macos, iokit=mock.DEFAULT, cf=mock.DEFAULT,
                        GetDeviceIntProperty=mock.DEFAULT)
@@ -56,8 +60,8 @@ class MacOsTest(unittest.TestCase):
 
     device = macos.MacOsHidDevice('fakepath')
 
-    self.assertEquals(64, device.GetInReportDataLength())
-    self.assertEquals(64, device.GetOutReportDataLength())
+    self.assertEqual(64, device.GetInReportDataLength())
+    self.assertEqual(64, device.GetOutReportDataLength())
 
   @mock.patch.object(macos.threading, 'Thread')
   @mock.patch.multiple(macos, iokit=mock.DEFAULT, cf=mock.DEFAULT,
@@ -80,11 +84,11 @@ class MacOsTest(unittest.TestCase):
     self.assertIsNotNone(set_report_call_args)
 
     set_report_call_pos_args = iokit.IOHIDDeviceSetReport.call_args[0]
-    self.assertEquals(len(set_report_call_pos_args), 5)
-    self.assertEquals(set_report_call_pos_args[0], 'handle')
-    self.assertEquals(set_report_call_pos_args[1], 1)
-    self.assertEquals(set_report_call_pos_args[2], 0)
-    self.assertEquals(set_report_call_pos_args[4], 64)
+    self.assertEqual(len(set_report_call_pos_args), 5)
+    self.assertEqual(set_report_call_pos_args[0], 'handle')
+    self.assertEqual(set_report_call_pos_args[1], 1)
+    self.assertEqual(set_report_call_pos_args[2], 0)
+    self.assertEqual(set_report_call_pos_args[4], 64)
 
     report_buffer = set_report_call_pos_args[3]
     self.assertEqual(len(report_buffer), 64)
@@ -130,7 +134,7 @@ class MacOsTest(unittest.TestCase):
 
     # Device read should return the callback data
     read_result = device.Read()
-    self.assertEquals(read_result, range(64), 'Read data should match data '
+    self.assertEqual(read_result, list(range(64)), 'Read data should match data '
                       'passed into the callback')
 
 

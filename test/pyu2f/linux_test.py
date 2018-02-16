@@ -14,13 +14,14 @@
 
 """Tests for pyu2f.hid.linux."""
 
-import __builtin__  # for mock.patch.object
 import base64
 import os
 import sys
 
 import mock
 
+import six
+from six.moves import builtins
 from u2flib_host.pyu2f import linux
 
 try:
@@ -84,39 +85,39 @@ class LinuxTest(unittest.TestCase):
     AddDevice(self.fs, 'hidraw2', 'Yubico U2F', 0x1050, 0x0407, YUBICO_RD)
     with mock.patch.object(linux, 'os', fake_filesystem.FakeOsModule(self.fs)):
       fake_open = fake_filesystem.FakeFileOpen(self.fs)
-      with mock.patch.object(__builtin__, 'open', fake_open):
+      with mock.patch.object(builtins, 'open', fake_open):
         devs = list(linux.LinuxHidDevice.Enumerate())
-        devs = sorted(devs, key=lambda(k):(k['vendor_id']))
+        devs = sorted(devs, key=lambda k: k['vendor_id'])
 
-        self.assertEquals(len(devs), 2)
-        self.assertEquals(devs[0]['vendor_id'], 0x046d)
-        self.assertEquals(devs[0]['product_id'], 0x0c31c)
-        self.assertEquals(devs[1]['vendor_id'], 0x1050)
-        self.assertEquals(devs[1]['product_id'], 0x0407)
-        self.assertEquals(devs[1]['usage_page'], 0xf1d0)
-        self.assertEquals(devs[1]['usage'], 1)
+        self.assertEqual(len(devs), 2)
+        self.assertEqual(devs[0]['vendor_id'], 0x046d)
+        self.assertEqual(devs[0]['product_id'], 0x0c31c)
+        self.assertEqual(devs[1]['vendor_id'], 0x1050)
+        self.assertEqual(devs[1]['product_id'], 0x0407)
+        self.assertEqual(devs[1]['usage_page'], 0xf1d0)
+        self.assertEqual(devs[1]['usage'], 1)
 
   def testCallOpen(self):
     AddDevice(self.fs, 'hidraw1', 'Yubico U2F', 0x1050, 0x0407, YUBICO_RD)
     fake_open = fake_filesystem.FakeFileOpen(self.fs)
     # The open() builtin is used to read from the fake sysfs
-    with mock.patch.object(__builtin__, 'open', fake_open):
+    with mock.patch.object(builtins, 'open', fake_open):
       # The os.open function is used to interact with the low
       # level device.  We don't want to use fakefs for that.
       fake_dev_os = FakeDeviceOsModule()
       with mock.patch.object(linux, 'os', fake_dev_os):
         dev = linux.LinuxHidDevice('/dev/hidraw1')
-        self.assertEquals(dev.GetInReportDataLength(), 64)
-        self.assertEquals(dev.GetOutReportDataLength(), 64)
+        self.assertEqual(dev.GetInReportDataLength(), 64)
+        self.assertEqual(dev.GetOutReportDataLength(), 64)
 
-        dev.Write(range(0, 64))
+        dev.Write(list(range(0, 64)))
         # The HidDevice implementation prepends a zero-byte representing the
         # report ID
-        self.assertEquals(map(ord, fake_dev_os.data_written),
-                          [0] + range(0, 64))
+        self.assertEqual(list(six.iterbytes(fake_dev_os.data_written)),
+                          [0] + list(range(0, 64)))
 
-        fake_dev_os.data_to_return = 'x' * 64
-        self.assertEquals(dev.Read(), [120] * 64)  # chr(120) = 'x'
+        fake_dev_os.data_to_return = b'x' * 64
+        self.assertEqual(dev.Read(), [120] * 64)  # chr(120) = 'x'
 
 
 if __name__ == '__main__':

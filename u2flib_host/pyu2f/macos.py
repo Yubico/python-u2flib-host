@@ -19,7 +19,7 @@ from __future__ import absolute_import
 import ctypes
 import ctypes.util
 import logging
-import Queue
+from six.moves.queue import Queue
 import sys
 import threading
 
@@ -31,14 +31,14 @@ logger = logging.getLogger('pyu2f.macos')
 DEVICE_PATH_BUFFER_SIZE = 512
 DEVICE_STRING_PROPERTY_BUFFER_SIZE = 512
 
-HID_DEVICE_PROPERTY_VENDOR_ID = 'VendorId'
-HID_DEVICE_PROPERTY_PRODUCT_ID = 'ProductID'
-HID_DEVICE_PROPERTY_PRODUCT = 'Product'
-HID_DEVICE_PROPERTY_PRIMARY_USAGE = 'PrimaryUsage'
-HID_DEVICE_PROPERTY_PRIMARY_USAGE_PAGE = 'PrimaryUsagePage'
-HID_DEVICE_PROPERTY_MAX_INPUT_REPORT_SIZE = 'MaxInputReportSize'
-HID_DEVICE_PROPERTY_MAX_OUTPUT_REPORT_SIZE = 'MaxOutputReportSize'
-HID_DEVICE_PROPERTY_REPORT_ID = 'ReportID'
+HID_DEVICE_PROPERTY_VENDOR_ID = b'VendorId'
+HID_DEVICE_PROPERTY_PRODUCT_ID = b'ProductID'
+HID_DEVICE_PROPERTY_PRODUCT = b'Product'
+HID_DEVICE_PROPERTY_PRIMARY_USAGE = b'PrimaryUsage'
+HID_DEVICE_PROPERTY_PRIMARY_USAGE_PAGE = b'PrimaryUsagePage'
+HID_DEVICE_PROPERTY_MAX_INPUT_REPORT_SIZE = b'MaxInputReportSize'
+HID_DEVICE_PROPERTY_MAX_OUTPUT_REPORT_SIZE = b'MaxOutputReportSize'
+HID_DEVICE_PROPERTY_REPORT_ID = b'ReportID'
 
 
 # Declare C types
@@ -102,7 +102,7 @@ K_CF_NUMBER_SINT32_TYPE = 3
 K_CF_STRING_ENCODING_UTF8 = 0x08000100
 K_CF_ALLOCATOR_DEFAULT = None
 
-K_IO_SERVICE_PLANE = 'IOService'
+K_IO_SERVICE_PLANE = b'IOService'
 K_IO_MASTER_PORT_DEFAULT = 0
 K_IO_HID_REPORT_TYPE_OUTPUT = 1
 K_IO_RETURN_SUCCESS = 0
@@ -373,7 +373,7 @@ class MacOsHidDevice(base.HidDevice):
                               .format(result))
 
     # Create read queue
-    self.read_queue = Queue.Queue()
+    self.read_queue = Queue()
 
     # Create and start read thread
     self.run_loop_ref = None
@@ -430,7 +430,7 @@ class MacOsHidDevice(base.HidDevice):
 
   def Read(self):
     """See base class."""
-    return self.read_queue.get(timeout=sys.maxint)
+    return self.read_queue.get(timeout=0xffffffff)
 
   def __del__(self):
     # Unregister the callback

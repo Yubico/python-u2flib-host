@@ -17,16 +17,15 @@
 This module imports the U2F HID Transport protocol as well as methods
 for discovering devices implementing this protocol.
 """
-
 from __future__ import absolute_import
 
 import logging
 import os
 import struct
 import time
+import six
 
 from . import errors, hid
-
 
 
 def HidUsageSelector(device):
@@ -105,7 +104,7 @@ class UsbHidTransport(object):
       ret[4] = self.cmd
       struct.pack_into('>H', ret, 5, self.size)
       ret[7:7 + len(self.payload)] = self.payload
-      return map(int, ret)
+      return list(six.iterbytes(bytes(ret)))
 
     @staticmethod
     def FromWireFormat(packet_size, data):
@@ -128,7 +127,7 @@ class UsbHidTransport(object):
         raise errors.InvalidPacketError()
       cid = ba[0:4]
       cmd = ba[4]
-      size = struct.unpack('>H', str(ba[5:7]))[0]
+      size = struct.unpack('>H', bytes(ba[5:7]))[0]
       payload = ba[7:7 + size]  # might truncate at packet_size
       return UsbHidTransport.InitPacket(packet_size, cid, cmd, size, payload)
 
@@ -165,7 +164,7 @@ class UsbHidTransport(object):
       ret[0:4] = self.cid
       ret[4] = self.seq
       ret[5:5 + len(self.payload)] = self.payload
-      return map(int, ret)
+      return [int(x) for x in ret]
 
     @staticmethod
     def FromWireFormat(packet_size, data):
@@ -243,8 +242,7 @@ class UsbHidTransport(object):
     """Sends and receives a message from the device."""
     # make a copy because we destroy it below
     self.logger.debug('payload: ' + str(list(payload_in)))
-    payload = bytearray()
-    payload[:] = payload_in
+    payload = bytearray(payload_in)
     for _ in range(2):
       self.InternalSend(cmd, payload)
       ret_cmd, ret_payload = self.InternalRecv()

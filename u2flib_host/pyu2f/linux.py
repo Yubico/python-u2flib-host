@@ -18,6 +18,7 @@ from __future__ import absolute_import
 
 import os
 import struct
+import six
 
 from . import base, errors
 
@@ -47,7 +48,7 @@ def GetValueLength(rd, pos):
     (key_size, data_len) where key_size is the number of bytes occupied by
     the key and data_len is the length of the value associated by the key.
   """
-  key = ord(rd[pos])
+  key = six.indexbytes(rd, pos)
   if key == LONG_ITEM_ENCODING:
     # If the key is tagged as a long item (0xfe), then the format is
     # [key (1 byte)] [data len (1 byte)] [item tag (1 byte)] [data (n # bytes)].
@@ -111,22 +112,23 @@ def ParseReportDescriptor(rd, desc):
   usage_page = None
   usage = None
 
+
   while pos < len(rd):
-    key = ord(rd[pos])
+    key = six.indexbytes(rd, pos)
 
     # First step, determine the value encoding (either long or short).
     key_size, value_length = GetValueLength(rd, pos)
 
     if key & REPORT_DESCRIPTOR_KEY_MASK == INPUT_ITEM:
       if report_count and report_size:
-        byte_length = (report_count * report_size) / 8
+        byte_length = (report_count * report_size) // 8
         desc.internal_max_in_report_len = max(
             desc.internal_max_in_report_len, byte_length)
         report_count = None
         report_size = None
     elif key & REPORT_DESCRIPTOR_KEY_MASK == OUTPUT_ITEM:
       if report_count and report_size:
-        byte_length = (report_count * report_size) / 8
+        byte_length = (report_count * report_size) // 8
         desc.internal_max_out_report_len = max(
             desc.internal_max_out_report_len, byte_length)
         report_count = None
@@ -154,16 +156,16 @@ def ParseReportDescriptor(rd, desc):
 
 
 def ParseUevent(uevent, desc):
-  lines = uevent.split('\n')
+  lines = uevent.split(b'\n')
   for line in lines:
     line = line.strip()
     if not line:
       continue
-    k, v = line.split('=')
-    if k == 'HID_NAME':
+    k, v = line.split(b'=')
+    if k == b'HID_NAME':
       desc.product_string = v.decode('utf8')
-    elif k == 'HID_ID':
-      _, vid, pid = v.split(':')
+    elif k == b'HID_ID':
+      _, vid, pid = v.split(b':')
       desc.vendor_id = int(vid, 16)
       desc.product_id = int(pid, 16)
 
@@ -216,11 +218,11 @@ class LinuxHidDevice(base.HidDevice):
 
   def Write(self, packet):
     """See base class."""
-    out = ''.join(map(chr, [0] + packet))  # Prepend the zero-byte (report ID)
+    out = bytes(bytearray([0] + packet))  # Prepend the zero-byte (report ID)
     os.write(self.dev, out)
 
   def Read(self):
     """See base class."""
     raw_in = os.read(self.dev, self.GetInReportDataLength())
-    decoded_in = map(ord, raw_in)
+    decoded_in = list(six.iterbytes(raw_in))
     return decoded_in

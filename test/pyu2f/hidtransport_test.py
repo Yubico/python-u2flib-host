@@ -16,17 +16,13 @@
 
 from __future__ import absolute_import
 
-import sys
-
+import six
 import mock
 
 from u2flib_host.pyu2f import hidtransport, errors
 from . import util
 
-if sys.version_info[:2] < (2, 7):
-  import unittest2 as unittest  # pylint: disable=g-import-not-at-top
-else:
-  import unittest  # pylint: disable=g-import-not-at-top
+import unittest
 
 
 def MakeKeyboard(path, usage):
@@ -89,12 +85,12 @@ class DiscoveryTest(unittest.TestCase):
         # Force the iterator into a list
         devs = list(hidtransport.DiscoverLocalHIDU2FDevices())
 
-        self.assertEquals(hid_mock.Enumerate.call_count, 1)
-        self.assertEquals(hid_mock.Open.call_count, 2)
-        self.assertEquals(len(devs), 2)
+        self.assertEqual(hid_mock.Enumerate.call_count, 1)
+        self.assertEqual(hid_mock.Open.call_count, 2)
+        self.assertEqual(len(devs), 2)
 
-        self.assertEquals(devs[0].hid_device.path, 'path3')
-        self.assertEquals(devs[1].hid_device.path, 'path4')
+        self.assertEqual(devs[0].hid_device.path, 'path3')
+        self.assertEqual(devs[1].hid_device.path, 'path4')
 
 
 class TransportTest(unittest.TestCase):
@@ -102,15 +98,15 @@ class TransportTest(unittest.TestCase):
   def testInit(self):
     fake_hid_dev = util.FakeHidDevice(bytearray([0x00, 0x00, 0x00, 0x01]))
     t = hidtransport.UsbHidTransport(fake_hid_dev)
-    self.assertEquals(t.cid, bytearray([0x00, 0x00, 0x00, 0x01]))
-    self.assertEquals(t.u2fhid_version, 0x01)
+    self.assertEqual(t.cid, bytearray([0x00, 0x00, 0x00, 0x01]))
+    self.assertEqual(t.u2fhid_version, 0x01)
 
   def testPing(self):
     fake_hid_dev = util.FakeHidDevice(bytearray([0x00, 0x00, 0x00, 0x01]))
     t = hidtransport.UsbHidTransport(fake_hid_dev)
 
-    reply = t.SendPing('1234')
-    self.assertEquals(reply, '1234')
+    reply = t.SendPing(b'1234')
+    self.assertEqual(reply, b'1234')
 
   def testMsg(self):
     fake_hid_dev = util.FakeHidDevice(
@@ -118,7 +114,7 @@ class TransportTest(unittest.TestCase):
     t = hidtransport.UsbHidTransport(fake_hid_dev)
 
     reply = t.SendMsgBytes([0x00, 0x01, 0x00, 0x00])
-    self.assertEquals(reply, bytearray([0x01, 0x90, 0x00]))
+    self.assertEqual(reply, bytearray([0x01, 0x90, 0x00]))
 
   def testMsgBusy(self):
     fake_hid_dev = util.FakeHidDevice(
@@ -129,11 +125,11 @@ class TransportTest(unittest.TestCase):
     # the second will succeed on the second retry.
     fake_hid_dev.SetChannelBusyCount(3)
     with mock.patch.object(hidtransport, 'time') as _:
-      self.assertRaisesRegexp(errors.HidError, '^Device Busy', t.SendMsgBytes,
-                              [0x00, 0x01, 0x00, 0x00])
+      six.assertRaisesRegex(self, errors.HidError, '^Device Busy', t.SendMsgBytes,
+                            [0x00, 0x01, 0x00, 0x00])
 
       reply = t.SendMsgBytes([0x00, 0x01, 0x00, 0x00])
-      self.assertEquals(reply, bytearray([0x01, 0x90, 0x00]))
+      self.assertEqual(reply, bytearray([0x01, 0x90, 0x00]))
 
   def testFragmentedResponseMsg(self):
     body = bytearray([x % 256 for x in range(0, 1000)])
@@ -142,7 +138,7 @@ class TransportTest(unittest.TestCase):
 
     reply = t.SendMsgBytes([0x00, 0x01, 0x00, 0x00])
     # Confirm we properly reassemble the message
-    self.assertEquals(reply, bytearray(x % 256 for x in range(0, 1000)))
+    self.assertEqual(reply, bytearray(x % 256 for x in range(0, 1000)))
 
   def testFragmentedSendApdu(self):
     body = bytearray(x % 256 for x in range(0, 1000))
@@ -151,36 +147,36 @@ class TransportTest(unittest.TestCase):
     t = hidtransport.UsbHidTransport(fake_hid_dev)
 
     reply = t.SendMsgBytes(body)
-    self.assertEquals(reply, bytearray([0x90, 0x00]))
+    self.assertEqual(reply, bytearray([0x90, 0x00]))
     # 1 init packet from creating transport, 18 packets to send
     # the fragmented message
-    self.assertEquals(len(fake_hid_dev.received_packets), 18)
+    self.assertEqual(len(fake_hid_dev.received_packets), 18)
 
   def testInitPacketShape(self):
     packet = hidtransport.UsbHidTransport.InitPacket(
-        64, bytearray('\x00\x00\x00\x01'), 0x83, 2, bytearray('\x01\x02'))
+        64, bytearray(b'\x00\x00\x00\x01'), 0x83, 2, bytearray(b'\x01\x02'))
 
-    self.assertEquals(packet.ToWireFormat(), RPad(
+    self.assertEqual(packet.ToWireFormat(), RPad(
         [0, 0, 0, 1, 0x83, 0, 2, 1, 2], 64))
 
     copy = hidtransport.UsbHidTransport.InitPacket.FromWireFormat(
         64, packet.ToWireFormat())
-    self.assertEquals(copy.cid, bytearray('\x00\x00\x00\x01'))
-    self.assertEquals(copy.cmd, 0x83)
-    self.assertEquals(copy.size, 2)
-    self.assertEquals(copy.payload, bytearray('\x01\x02'))
+    self.assertEqual(copy.cid, bytearray(b'\x00\x00\x00\x01'))
+    self.assertEqual(copy.cmd, 0x83)
+    self.assertEqual(copy.size, 2)
+    self.assertEqual(copy.payload, bytearray(b'\x01\x02'))
 
   def testContPacketShape(self):
     packet = hidtransport.UsbHidTransport.ContPacket(
-        64, bytearray('\x00\x00\x00\x01'), 5, bytearray('\x01\x02'))
+        64, bytearray(b'\x00\x00\x00\x01'), 5, bytearray(b'\x01\x02'))
 
-    self.assertEquals(packet.ToWireFormat(), RPad([0, 0, 0, 1, 5, 1, 2], 64))
+    self.assertEqual(packet.ToWireFormat(), RPad([0, 0, 0, 1, 5, 1, 2], 64))
 
     copy = hidtransport.UsbHidTransport.ContPacket.FromWireFormat(
         64, packet.ToWireFormat())
-    self.assertEquals(copy.cid, bytearray('\x00\x00\x00\x01'))
-    self.assertEquals(copy.seq, 5)
-    self.assertEquals(copy.payload, RPad(bytearray('\x01\x02'), 59))
+    self.assertEqual(copy.cid, bytearray(b'\x00\x00\x00\x01'))
+    self.assertEqual(copy.seq, 5)
+    self.assertEqual(copy.payload, RPad(bytearray(b'\x01\x02'), 59))
 
 
 if __name__ == '__main__':
