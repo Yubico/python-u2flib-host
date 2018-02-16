@@ -25,10 +25,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from u2flib_host.yubicommon.compat import text_type
-
 from base64 import urlsafe_b64decode, urlsafe_b64encode
-from hashlib import sha256
+import six
 
 __all__ = [
     'u2str',
@@ -43,20 +41,20 @@ def u2str(data):
         return {u2str(k): u2str(v) for k, v in data.items()}
     elif isinstance(data, list):
         return [u2str(x) for x in data]
-    elif isinstance(data, text_type):
+    elif isinstance(data, six.text_type):
         return data.encode('utf-8')
     else:
         return data
 
 
 def websafe_decode(data):
-    if isinstance(data, text_type):
+    if isinstance(data, six.text_type):
         data = data.encode('ascii')
     data += b'=' * (-len(data) % 4)
     return urlsafe_b64decode(data)
 
 
 def websafe_encode(data):
-    if isinstance(data, text_type):
+    if isinstance(data, six.text_type):
         data = data.encode('ascii')
     return urlsafe_b64encode(data).replace(b'=', b'').decode('ascii')

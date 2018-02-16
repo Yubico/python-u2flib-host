@@ -29,8 +29,6 @@ from __future__ import print_function
 
 from u2flib_host import u2f, exc, __version__
 from u2flib_host.constants import APDU_USE_NOT_SATISFIED
-from u2flib_host.utils import u2str
-from u2flib_host.yubicommon.compat import text_type
 
 import time
 import json
@@ -95,7 +93,7 @@ def parse_args():
 def main():
     args = parse_args()
 
-    facet = text_type(args.facet)
+    facet = args.facet
     if args.infile:
         with open(args.infile, 'r') as f:
             data = f.read()

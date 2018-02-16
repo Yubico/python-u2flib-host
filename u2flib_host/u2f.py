@@ -27,9 +27,9 @@
 
 from u2flib_host import u2f_v2
 from u2flib_host import hid_transport
-from u2flib_host.yubicommon.compat import string_types
 
 import json
+import six
 
 TRANSPORTS = [
     hid_transport
@@ -46,13 +46,13 @@ def list_devices():
     for transport in TRANSPORTS:
         try:
             devices.extend(transport.list_devices())
-        except:
+        except Exception:
             pass
     return devices
 
 
 def get_lib(device, data):
-    if isinstance(data, string_types):
+    if isinstance(data, six.string_types):
         data = json.loads(data)
 
     version = data['version']

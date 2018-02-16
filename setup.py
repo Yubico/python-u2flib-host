@@ -25,11 +25,23 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from u2flib_host.yubicommon.setup import setup
+from setuptools import setup, find_packages
+import re
+
+
+VERSION_PATTERN = re.compile(r"(?m)^__version__\s*=\s*['\"](.+)['\"]$")
+
+
+def get_version():
+    with open('u2flib_host/__init__.py', 'r') as f:
+        match = VERSION_PATTERN.search(f.read())
+        return match.group(1)
 
 
 setup(
     name='python-u2flib-host',
+    version=get_version(),
+    packages=find_packages(),
     author='Dain Nilsson',
     author_email='dain@yubico.com',
     description='Python based U2F host library',

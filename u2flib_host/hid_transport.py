@@ -34,8 +34,9 @@ except ImportError:
     import hid
 from time import time
 from u2flib_host.device import U2FDevice
-from u2flib_host.yubicommon.compat import byte2int, int2byte
 from u2flib_host import exc
+import six
+import struct
 
 DEVICES = [
     (0x1050, 0x0200),  # Gnubby
@@ -151,44 +152,42 @@ class HIDDevice(U2FDevice):
 
     def _send_req(self, cid, cmd, data):
         size = len(data)
-        bc_l = int2byte(size & 0xff)
-        bc_h = int2byte(size >> 8 & 0xff)
-        payload = cid + int2byte(TYPE_INIT | cmd) + bc_h + bc_l + \
+        payload = cid + struct.pack('>BH', TYPE_INIT | cmd, size) + \
             data[:HID_RPT_SIZE - 7]
         payload += b'\0' * (HID_RPT_SIZE - len(payload))
-        self.handle.write([0] + [byte2int(c) for c in payload])
+        self.handle.write([0] + list(six.iterbytes(payload)))
         data = data[HID_RPT_SIZE - 7:]
         seq = 0
         while len(data) > 0:
-            payload = cid + int2byte(0x7f & seq) + data[:HID_RPT_SIZE - 5]
+            payload = cid + six.int2byte(0x7f & seq) + data[:HID_RPT_SIZE - 5]
             payload += b'\0' * (HID_RPT_SIZE - len(payload))
-            self.handle.write([0] + [byte2int(c) for c in payload])
+            self.handle.write([0] + list(six.iterbytes(payload)))
             data = data[HID_RPT_SIZE - 5:]
             seq += 1
 
     def _read_resp(self, cid, cmd):
         resp = b'.'
-        header = cid + int2byte(TYPE_INIT | cmd)
+        header = cid + six.int2byte(TYPE_INIT | cmd)
         while resp and resp[:5] != header:
             resp_vals = _read_timeout(self.handle, HID_RPT_SIZE)
-            resp = b''.join(int2byte(v) for v in resp_vals)
-            if resp[:5] == cid + int2byte(STAT_ERR):
-                raise U2FHIDError(byte2int(resp[7]))
+            resp = bytes(bytearray(resp_vals))
+            if resp[:5] == cid + six.int2byte(STAT_ERR):
+                raise U2FHIDError(six.indexbytes(resp, 7))
 
         if not resp:
             raise exc.DeviceError("Invalid response from device!")
 
-        data_len = (byte2int(resp[5]) << 8) + byte2int(resp[6])
+        data_len = struct.unpack('>H', resp[5:7])[0]
         data = resp[7:min(7 + data_len, HID_RPT_SIZE)]
         data_len -= len(data)
 
         seq = 0
         while data_len > 0:
             resp_vals = _read_timeout(self.handle, HID_RPT_SIZE)
-            resp = b''.join(int2byte(v) for v in resp_vals)
+            resp = bytes(bytearray(resp_vals))
             if resp[:4] != cid:
                 raise exc.DeviceError("Wrong CID from device!")
-            if byte2int(resp[4]) != seq & 0x7f:
+            if six.indexbytes(resp, 4) != seq & 0x7f:
                 raise exc.DeviceError("Wrong SEQ from device!")
             seq += 1
             new_data = resp[5:min(5 + data_len, HID_RPT_SIZE)]
@@ -198,7 +197,7 @@ class HIDDevice(U2FDevice):
 
     def call(self, cmd, data=b''):
         if isinstance(data, int):
-            data = int2byte(data)
+            data = six.int2byte(data)
 
         self._send_req(self.cid, cmd, data)
         return self._read_resp(self.cid, cmd)

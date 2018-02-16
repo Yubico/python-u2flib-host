@@ -28,10 +28,10 @@
 from u2flib_host.constants import INS_ENROLL, INS_SIGN
 from u2flib_host.utils import websafe_decode, websafe_encode
 from u2flib_host.appid import verify_facet
-from u2flib_host.yubicommon.compat import string_types, int2byte
 
 from hashlib import sha256
 import json
+import six
 
 VERSION = 'U2F_V2'
 
@@ -48,7 +48,7 @@ def register(device, data, facet):
 
     """
 
-    if isinstance(data, string_types):
+    if isinstance(data, six.string_types):
         data = json.loads(data)
 
     if data['version'] != VERSION:
@@ -91,7 +91,7 @@ def authenticate(device, data, facet, check_only=False):
 
     """
 
-    if isinstance(data, string_types):
+    if isinstance(data, six.string_types):
         data = json.loads(data)
 
     if data['version'] != VERSION:
@@ -112,7 +112,7 @@ def authenticate(device, data, facet, check_only=False):
     client_data = json.dumps(client_data)
     client_param = sha256(client_data.encode('utf8')).digest()
 
-    request = client_param + app_param + int2byte(
+    request = client_param + app_param + six.int2byte(
         len(key_handle)) + key_handle
 
     p1 = 0x07 if check_only else 0x03

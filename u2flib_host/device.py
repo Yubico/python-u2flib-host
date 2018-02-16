@@ -26,9 +26,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from u2flib_host.constants import APDU_OK, INS_GET_VERSION
-from u2flib_host.yubicommon.compat import int2byte
 from u2flib_host import exc
 import struct
+import six
 
 
 class U2FDevice(object):
@@ -93,7 +93,7 @@ class U2FDevice(object):
         if data is None:
             data = b''
         elif isinstance(data, int):
-            data = int2byte(data)
+            data = six.int2byte(data)
 
         size = len(data)
         l0 = size >> 16 & 0xff

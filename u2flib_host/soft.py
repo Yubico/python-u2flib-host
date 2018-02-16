@@ -37,12 +37,12 @@ except ImportError:
 
 from u2flib_host.device import U2FDevice
 from u2flib_host.constants import INS_ENROLL, INS_SIGN
-from u2flib_host.yubicommon.compat import byte2int, int2byte
 from u2flib_host import exc
 import base64
 import json
 import os
 import struct
+import six
 
 # AKA NID_X9_62_prime256v1 in OpenSSL
 CURVE = ec.SECP256R1
@@ -141,7 +141,7 @@ class SoftU2FDevice(U2FDevice):
         )
         signature = signer.finalize()
 
-        raw_response = b'\x05' + pub_key + int2byte(len(key_handle)) + \
+        raw_response = b'\x05' + pub_key + six.int2byte(len(key_handle)) + \
             key_handle + cert + signature
 
         return raw_response
@@ -149,7 +149,7 @@ class SoftU2FDevice(U2FDevice):
     def _authenticate(self, data):
         client_param = data[:32]
         app_param = data[32:64]
-        kh_len = byte2int(data[64])
+        kh_len = six.indexbytes(data, 64)
         key_handle = _b16text(data[65:65+kh_len])
         if key_handle not in self.data['keys']:
             raise ValueError("Unknown key handle!")
@@ -168,7 +168,7 @@ class SoftU2FDevice(U2FDevice):
         self._persist()
 
         # Create signature
-        touch = b'\x01' # Always indicate user presence
+        touch = b'\x01'  # Always indicate user presence
         counter = struct.pack('>I', self.data['counter'])
 
         signer = privu.signer(ec.ECDSA(hashes.SHA256()))
