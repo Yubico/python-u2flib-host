@@ -3,9 +3,13 @@ import unittest
 from u2flib_host import hid_transport
 from u2flib_host import exc
 from u2flib_host.yubicommon.compat import byte2int, int2byte
-from mock import patch
 
-class TestHIDDevice():
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
+
+class TestHIDDevice(object):
     def write(self, payload):
         self.cid = payload[1:5]
         self.cmd = payload[5] ^ hid_transport.TYPE_INIT
@@ -46,7 +50,7 @@ class HIDDeviceTest(unittest.TestCase):
             dev.init()
             self.assertEqual(dev.capabilities, 0x05)
 
-    def test_init_invalid_nounce(self):
+    def test_init_invalid_nonce(self):
         with patch.object(os, 'urandom', return_value=(b'\xab'*8)) as mock_method:
             hid_device = TestHIDDevice()
             hid_device.response = HIDDeviceTest.build_response(

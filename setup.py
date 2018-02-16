@@ -27,6 +27,9 @@
 
 from u2flib_host.yubicommon.setup import setup
 
+tests_require = ['cryptography>=1.0']
+if (sys.version_info < (3, 3)):
+    tests_require.append('mock')
 
 setup(
     name='python-u2flib-host',
@@ -44,7 +47,7 @@ setup(
             'u2f-authenticate=u2flib_host.authenticate:main',
         ],
     },
-    tests_require=['cryptography>=1.0'],
+    tests_require=tests_require,
     extras_require={
         'soft_device': ['cryptography>=1.0'],
     },
