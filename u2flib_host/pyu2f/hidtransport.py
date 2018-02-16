@@ -237,6 +237,7 @@ class UsbHidTransport(object):
     self.cid = bytearray(r[8:12])
 
     self.u2fhid_version = r[12]
+    self.capabilities = r[16]
 
   def InternalExchange(self, cmd, payload_in):
     """Sends and receives a message from the device."""

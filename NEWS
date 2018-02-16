@@ -1,3 +1,6 @@
+* Version 4.0.0 (unreleased)
+ ** Use native backends from pyu2f instead of hidapi.
+
 * Version 3.0.2 (released 2017-06-16)
  ** Bugfix: Continue execution with next device if one device fails to open.
 

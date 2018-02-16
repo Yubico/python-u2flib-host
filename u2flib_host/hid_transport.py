@@ -85,6 +85,7 @@ class HIDDevice(U2FDevice):
 
     def __init__(self, dev):
         self._dev = dev
+        self.capabilities = dev.capabilities
 
     def set_mode(self, mode):
         data = mode + b'\x0f\x00\x00'
@@ -109,4 +110,4 @@ class HIDDevice(U2FDevice):
         if isinstance(data, int):
             data = six.int2byte(data)
 
-        return self._dev.InternalExchange(TYPE_INIT | cmd, data)
+        return bytes(self._dev.InternalExchange(TYPE_INIT | cmd, data))
