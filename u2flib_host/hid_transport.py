@@ -32,7 +32,7 @@ try:
     import hidraw as hid  # Prefer hidraw
 except ImportError:
     import hid
-from time import time
+from time import time, sleep
 from u2flib_host.device import U2FDevice
 from u2flib_host.yubicommon.compat import byte2int, int2byte
 from u2flib_host import exc
@@ -110,6 +110,7 @@ class HIDDevice(U2FDevice):
     def __init__(self, path):
         self.path = path
         self.cid = b"\xff\xff\xff\xff"
+        self.capabilities = 0x00
 
     def open(self):
         self.handle = hid.device()
@@ -125,10 +126,19 @@ class HIDDevice(U2FDevice):
     def init(self):
         nonce = os.urandom(8)
         resp = self.call(CMD_INIT, nonce)
-        while resp[:8] != nonce:
-            print("Wrong nonce, read again...")
+
+        timeout = time() + 2.0
+        while (len(resp) != 17 or resp[:8] != nonce):
+            if timeout < time():
+                raise exc.DeviceError('Wrong INIT response from device')
+            sleep(0.1)
             resp = self._read_resp(self.cid, CMD_INIT)
+
         self.cid = resp[8:12]
+        self.capabilities = byte2int(resp[16])
+
+    def ctap2_enabled(self):
+        return (self.capabilities >> 2) & 0x01
 
     def set_mode(self, mode):
         data = mode + b"\x0f\x00\x00"

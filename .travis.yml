@@ -22,7 +22,7 @@ addons:
 
 install:
   - pip install "pip>=7.0.2" wheel
-  - pip install -r dev-requirements.txt
+  - $TRAVIS_BUILD_DIR/dev-requirements.py
   - pip install -e .
 
 script:
