@@ -26,7 +26,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from setuptools import setup, find_packages
-import sys
 import re
 
 
@@ -38,10 +37,6 @@ def get_version():
         match = VERSION_PATTERN.search(f.read())
         return match.group(1)
 
-
-tests_require = ['cryptography>=1.0', 'pyfakefs>=2.4']
-if (sys.version_info < (3, 3)):
-    tests_require.append('mock>=1.0.1')
 
 setup(
     name='python-u2flib-host',
@@ -61,7 +56,7 @@ setup(
             'u2f-authenticate=u2flib_host.authenticate:main',
         ],
     },
-    tests_require=tests_require,
+    tests_require=['cryptography>=1.0', 'mock>=1.0.1', 'pyfakefs>=2.4'],
     extras_require={
         'soft_device': ['cryptography>=1.0'],
     },

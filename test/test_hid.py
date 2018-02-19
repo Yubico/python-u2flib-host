@@ -31,10 +31,12 @@ import unittest
 
 class HidTest(unittest.TestCase):
     def get_device(self):
-        devs = list_devices()
-        if len(devs) != 1:
+        try:
+            devs = list_devices()
+            assert len(devs) == 1
+            return devs[0]
+        except Exception:
             self.skipTest("Tests require a single U2F HID device")
-        return devs[0]
 
     def test_echo(self):
         msg1 = b'hello world!'
