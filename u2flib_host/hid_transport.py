@@ -87,6 +87,9 @@ class HIDDevice(U2FDevice):
         self._dev = dev
         self.capabilities = dev.capabilities
 
+    def ctap2_enabled(self):
+        return (self.capabilities >> 2) & 0x01
+
     def set_mode(self, mode):
         data = mode + b'\x0f\x00\x00'
         self.call(U2FHID_YUBIKEY_DEVICE_CONFIG, data)
