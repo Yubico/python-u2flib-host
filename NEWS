@@ -1,3 +1,7 @@
+* Version 3.0.3 (released 2018-03-16)
+ ** Add CTAP HID capability bits to the HIDDevice object.
+ ** Change the max length of response data to be compatible with more devices.
+
 * Version 3.0.2 (released 2017-06-16)
  ** Bugfix: Continue execution with next device if one device fails to open.
 
