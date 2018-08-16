@@ -159,6 +159,13 @@ class HIDDevice(U2FDevice):
     def lock(self, lock_time=10):
         self.call(CMD_LOCK, lock_time)
 
+    def _write_to_device(self, to_send):
+        expected = len(to_send)
+        actual = 0
+        while actual != expected:
+            actual = self.handle.write(to_send)
+            sleep(0.025)
+
     def _send_req(self, cid, cmd, data):
         size = len(data)
         bc_l = int2byte(size & 0xff)
@@ -166,13 +173,13 @@ class HIDDevice(U2FDevice):
         payload = cid + int2byte(TYPE_INIT | cmd) + bc_h + bc_l + \
             data[:HID_RPT_SIZE - 7]
         payload += b'\0' * (HID_RPT_SIZE - len(payload))
-        self.handle.write([0] + [byte2int(c) for c in payload])
+        self._write_to_device([0] + [byte2int(c) for c in payload])
         data = data[HID_RPT_SIZE - 7:]
         seq = 0
         while len(data) > 0:
             payload = cid + int2byte(0x7f & seq) + data[:HID_RPT_SIZE - 5]
             payload += b'\0' * (HID_RPT_SIZE - len(payload))
-            self.handle.write([0] + [byte2int(c) for c in payload])
+            self._write_to_device([0] + [byte2int(c) for c in payload])
             data = data[HID_RPT_SIZE - 5:]
             seq += 1
 
