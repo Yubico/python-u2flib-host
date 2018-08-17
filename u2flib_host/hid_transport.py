@@ -159,12 +159,17 @@ class HIDDevice(U2FDevice):
     def lock(self, lock_time=10):
         self.call(CMD_LOCK, lock_time)
 
-    def _write_to_device(self, to_send):
+    def _write_to_device(self, to_send, timeout=2.0):
         expected = len(to_send)
         actual = 0
+        stop_at = time() + timeout
         while actual != expected:
+            if (time() > stop_at):
+                raise exc.DeviceError("Unable to send data to the device")
+
             actual = self.handle.write(to_send)
             sleep(0.025)
+
 
     def _send_req(self, cid, cmd, data):
         size = len(data)
