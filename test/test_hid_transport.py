@@ -15,6 +15,7 @@ class TestHIDDevice(object):
         self.cmd = payload[5] ^ hid_transport.TYPE_INIT
         self.size = (payload[6] << 8) + payload[7]
         self.data = list(map(int2byte, payload[8:(8 + self.size)]))
+        return len(payload)
 
     def read(self, size):
         self.response += [0] * (hid_transport.HID_RPT_SIZE - len(self.response) + 1)
