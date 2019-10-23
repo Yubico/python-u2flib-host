@@ -38,6 +38,7 @@ from u2flib_host.yubicommon.compat import byte2int, int2byte
 from u2flib_host import exc
 
 DEVICES = [
+    (0x096e, 0x0850),  # Feitian Technologies, Inc. ePass FIDO
     (0x1050, 0x0200),  # Gnubby
     (0x1050, 0x0113),  # YubiKey NEO U2F
     (0x1050, 0x0114),  # YubiKey NEO OTP+U2F
