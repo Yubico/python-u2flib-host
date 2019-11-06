@@ -50,6 +50,8 @@ DEVICES = [
     (0x1050, 0x0406),  # YubiKey 4 U2F+CCID
     (0x1050, 0x0407),  # YubiKey 4 OTP+U2F+CCID
     (0x2581, 0xf1d0),  # Plug-Up U2F Security Key
+    (0x096e, 0x0858),  # FT U2F
+    (0x096e, 0x085b),  # FS ePass FIDO
 ]
 HID_RPT_SIZE = 64
 
