@@ -38,7 +38,6 @@ from u2flib_host.yubicommon.compat import byte2int, int2byte
 from u2flib_host import exc
 
 DEVICES = [
-    (0x096e, 0x0850),  # Feitian Technologies, Inc. ePass FIDO
     (0x1050, 0x0200),  # Gnubby
     (0x1050, 0x0113),  # YubiKey NEO U2F
     (0x1050, 0x0114),  # YubiKey NEO OTP+U2F
@@ -51,8 +50,11 @@ DEVICES = [
     (0x1050, 0x0406),  # YubiKey 4 U2F+CCID
     (0x1050, 0x0407),  # YubiKey 4 OTP+U2F+CCID
     (0x2581, 0xf1d0),  # Plug-Up U2F Security Key
+    (0x096e, 0x0850),  # Feitian Technologies, Inc. ePass FIDO
     (0x096e, 0x0858),  # FT U2F
     (0x096e, 0x085b),  # FS ePass FIDO
+    (0x24dc, 0x0501),  # JaCarta U2F
+    (0x1ea8, 0xf025),  # Thetis U2F
 ]
 HID_RPT_SIZE = 64
 
