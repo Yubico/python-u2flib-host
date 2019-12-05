@@ -1,6 +1,8 @@
 == u2flib-host ==
 Provides library functionality for communicating with a U2F device over USB.
 
+# NOTE: This project is superseded by https://github.com/Yubico/python-fido2
+
 Two executables are provided, u2f-register and u2f-authenticate, which support
 the register and authenticated commands of U2F as defined in the
 http://fidoalliance.org/specifications/download[FIDO specifications].
@@ -58,8 +60,8 @@ for device in devices:
 
 ==== Executable use ====
 The examples below use the soft U2F device to register and authenticate against
-the u2f_server example server from the 
-http://developers.yubico.com/python-u2flib-server[python-u2flib-server] project. 
+the u2f_server example server from the
+http://developers.yubico.com/python-u2flib-server[python-u2flib-server] project.
 See that project for more details.
 The register step will create a new U2F key pair and store the credential in
 the soft_device.json file. The authenticate step will use this credential to
