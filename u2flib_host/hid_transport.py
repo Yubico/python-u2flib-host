@@ -55,6 +55,7 @@ DEVICES = [
     (0x096e, 0x085b),  # FS ePass FIDO
     (0x24dc, 0x0501),  # JaCarta U2F
     (0x1ea8, 0xf025),  # Thetis U2F
+    (0x1d50, 0x60fc),  # OnlyKey U2F
 ]
 HID_RPT_SIZE = 64
 
